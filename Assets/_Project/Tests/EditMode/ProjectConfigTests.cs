@@ -41,7 +41,7 @@ namespace RescueSim.Tests
             Assert.GreaterOrEqual((int)PlayerSettings.Android.minSdkVersion, 29, "Quest 3 requires Android 10+ (API 29)");
             Assert.IsFalse(PlayerSettings.GetUseDefaultGraphicsAPIs(BuildTarget.Android), "Android should use an explicit graphics API list");
             var apis = PlayerSettings.GetGraphicsAPIs(BuildTarget.Android);
-            CollectionAssert.DoesNotContain(apis, UnityEngine.Rendering.GraphicsDeviceType.OpenGLES2);
+            CollectionAssert.Contains(apis, UnityEngine.Rendering.GraphicsDeviceType.Vulkan, "Quest builds should use Vulkan");
         }
     }
 }

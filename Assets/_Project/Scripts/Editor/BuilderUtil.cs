@@ -19,6 +19,9 @@ namespace RescueSim.EditorTools
         public static void EnsureDir(string assetPath)
         {
             if (AssetDatabase.IsValidFolder(assetPath)) return;
+            // The folder can exist on disk before the AssetDatabase knows about it; creating it again would
+            // produce "Name 1", "Name 2", ... duplicates, so import the existing folder instead.
+            if (Directory.Exists(assetPath)) { AssetDatabase.ImportAsset(assetPath); if (AssetDatabase.IsValidFolder(assetPath)) return; }
             string parent = Path.GetDirectoryName(assetPath).Replace('\\', '/');
             EnsureDir(parent);
             AssetDatabase.CreateFolder(parent, Path.GetFileName(assetPath));
