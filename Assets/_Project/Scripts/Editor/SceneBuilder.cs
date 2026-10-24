@@ -132,6 +132,8 @@ namespace RescueSim.EditorTools
                 es.AddComponent<XRUIInputModule>();
             }
 
+            go.AddComponent<XRInputProbe>();
+
             // Comfort: applies saved settings to the rig's locomotion providers.
             var comfort = go.AddComponent<ComfortApplier>();
 
@@ -193,6 +195,7 @@ namespace RescueSim.EditorTools
         static void BuildMenu(MissionDefinition mission)
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+            mission = AssetDatabase.LoadAssetAtPath<MissionDefinition>(MissionAssetPath);
             SetSkybox();
             RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
             RenderSettings.ambientLight = new Color(0.12f, 0.13f, 0.16f);
@@ -276,6 +279,7 @@ namespace RescueSim.EditorTools
             AssetDatabase.DeleteAsset(MissionScenePath);
             if (!AssetDatabase.CopyAsset(PackScene, MissionScenePath)) throw new System.Exception("Could not copy " + PackScene);
             var scene = EditorSceneManager.OpenScene(MissionScenePath, OpenSceneMode.Single);
+            def = AssetDatabase.LoadAssetAtPath<MissionDefinition>(MissionAssetPath);
 
             StripPostProcessing();
             ReduceLighting();
@@ -599,8 +603,8 @@ namespace RescueSim.EditorTools
             var sign = UIFactory.CreateWorldCanvas("Sign", new Vector2(520, 130), parent, 0.0016f, false);
             sign.transform.position = new Vector3(-9f, 1.6f, 22.5f);
             sign.gameObject.AddComponent<FaceCamera>();
-            UIFactory.AddText(sign.transform, "FIRE EXTINGUISHER", 56f, new Vector2(0, 0), new Vector2(500, 70), TextAlignmentOptions.Center, new Color(1f, 0.45f, 0.4f), FontStyles.Bold);
-            UIFactory.AddText(sign.transform, "Grip to pick up. Trigger to spray.", 34f, new Vector2(0, -68), new Vector2(500, 50), TextAlignmentOptions.Center, UIFactory.TextDim);
+            UIFactory.AddText(sign.transform, "FIRE EXTINGUISHER", 42f, new Vector2(0, 0), new Vector2(500, 70), TextAlignmentOptions.Center, new Color(1f, 0.45f, 0.4f), FontStyles.Bold);
+            UIFactory.AddText(sign.transform, "Grip to pick up. Trigger to spray.", 28f, new Vector2(0, -58), new Vector2(500, 50), TextAlignmentOptions.Center, UIFactory.TextDim);
             return ex;
         }
 
