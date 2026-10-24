@@ -55,7 +55,7 @@ namespace RescueSim.Interaction
             if (n == 0 && !IsCleared && canComplete)
             {
                 IsCleared = true;
-                foreach (var g in hideWhenCleared) if (g != null) g.SetActive(false);
+                if (hideWhenCleared != null) foreach (var g in hideWhenCleared) if (g != null) g.SetActive(false);
                 sound?.PlayOneShot(SpatialSound.Cue.Success);
                 if (mission != null) mission.CompleteObjective(objectiveId, "Passage cleared. The route north is open.");
             }
