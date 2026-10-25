@@ -170,6 +170,74 @@ namespace RescueSim.UI
             return toggle;
         }
 
+        static Sprite _star;
+        /// <summary>Procedural 5-point star (the default TMP font has no star glyph).</summary>
+        public static Sprite StarSprite
+        {
+            get
+            {
+                if (_star != null) return _star;
+                const int n = 96;
+                var tex = new Texture2D(n, n, TextureFormat.RGBA32, false) { name = "StarSprite", wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Bilinear };
+                var poly = new Vector2[10];
+                for (int i = 0; i < 10; i++)
+                {
+                    float r = (i % 2 == 0) ? 0.47f : 0.19f;
+                    float a = Mathf.PI / 2f + i * Mathf.PI / 5f;
+                    poly[i] = new Vector2(0.5f + r * Mathf.Cos(a), 0.5f + r * Mathf.Sin(a));
+                }
+                var px = new Color32[n * n];
+                for (int y = 0; y < n; y++)
+                    for (int x = 0; x < n; x++)
+                    {
+                        float cover = 0f;
+                        for (int sy = 0; sy < 2; sy++)
+                            for (int sx = 0; sx < 2; sx++)
+                                if (InPoly(poly, (x + 0.25f + 0.5f * sx) / n, (y + 0.25f + 0.5f * sy) / n)) cover += 0.25f;
+                        px[y * n + x] = new Color(1f, 1f, 1f, cover);
+                    }
+                tex.SetPixels32(px);
+                tex.Apply(false);
+                _star = Sprite.Create(tex, new Rect(0, 0, n, n), new Vector2(0.5f, 0.5f), 100f);
+                return _star;
+            }
+        }
+
+        static bool InPoly(Vector2[] p, float x, float y)
+        {
+            bool inside = false;
+            for (int i = 0, j = p.Length - 1; i < p.Length; j = i++)
+                if ((p[i].y > y) != (p[j].y > y) && x < (p[j].x - p[i].x) * (y - p[i].y) / (p[j].y - p[i].y) + p[i].x) inside = !inside;
+            return inside;
+        }
+
+        /// <summary>Row of three stars (StarRating) centred at <paramref name="anchoredPos"/>.</summary>
+        public static StarRating AddStars(Transform parent, Vector2 anchoredPos, float starSize, float spacing = 12f, string name = "Stars")
+        {
+            var root = NewUI<RectTransform>(name, parent);
+            root.anchorMin = root.anchorMax = new Vector2(0.5f, 1f);
+            root.pivot = new Vector2(0.5f, 1f);
+            root.anchoredPosition = anchoredPos;
+            root.sizeDelta = new Vector2(3 * starSize + 2 * spacing, starSize);
+            var rating = root.gameObject.AddComponent<StarRating>();
+            var imgs = new Image[3];
+            for (int i = 0; i < 3; i++)
+            {
+                var img = NewUI<Image>("Star" + i, root);
+                img.sprite = StarSprite;
+                img.raycastTarget = false;
+                var rt = img.rectTransform;
+                rt.anchorMin = rt.anchorMax = new Vector2(0f, 0.5f);
+                rt.pivot = new Vector2(0f, 0.5f);
+                rt.anchoredPosition = new Vector2(i * (starSize + spacing), 0f);
+                rt.sizeDelta = new Vector2(starSize, starSize);
+                imgs[i] = img;
+            }
+            rating.Bind(imgs);
+            rating.SetStars(0);
+            return rating;
+        }
+
         static Sprite _white;
         /// <summary>1x1 white sprite; Image.Filled needs a sprite to honour fillAmount.</summary>
         public static Sprite WhiteSprite => _white != null ? _white : (_white = Sprite.Create(Texture2D.whiteTexture, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 1f));

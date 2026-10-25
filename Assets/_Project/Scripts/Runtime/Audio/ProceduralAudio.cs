@@ -39,6 +39,10 @@ namespace RescueSim.Audio
                 case SpatialSound.Cue.AmbientHum: return Make("hum", Hum(), loop: true);
                 case SpatialSound.Cue.Spray: return Make("spray", Spray(), loop: true);
                 case SpatialSound.Cue.Cough: return Make("cough", Cough());
+                case SpatialSound.Cue.Rain: return Make("rain", Rain(), loop: true);
+                case SpatialSound.Cue.Rumble: return Make("rumble", Rumble(), loop: true);
+                case SpatialSound.Cue.WaterLap: return Make("waterlap", WaterLap(), loop: true);
+                case SpatialSound.Cue.Wind: return Make("wind", Wind(), loop: true);
                 default: return Make("silence", new float[SampleRate / 10]);
             }
         }
@@ -251,6 +255,78 @@ namespace RescueSim.Audio
                     d[start + i] = (Mathf.Sin(2f * Mathf.PI * f * t) * 0.5f + ((float)rng.NextDouble() * 2f - 1f) * 0.5f) * env * 0.6f;
                 }
             }
+            return d;
+        }
+
+        static float[] Rain()
+        {
+            int n = SampleRate * 3;
+            var d = new float[n];
+            var rng = new System.Random(11);
+            float prev = 0f, lp = 0f;
+            for (int i = 0; i < n; i++)
+            {
+                float w = (float)rng.NextDouble() * 2f - 1f;
+                float hp = w - prev; prev = w * 0.85f;
+                lp += (hp - lp) * 0.55f;
+                float drop = rng.NextDouble() < 0.0025 ? (float)rng.NextDouble() * 0.5f : 0f;
+                d[i] = (lp * 0.2f) + drop * (float)(rng.NextDouble() * 2 - 1);
+            }
+            Crossfade(d, SampleRate / 8);
+            return d;
+        }
+
+        static float[] Rumble()
+        {
+            int n = SampleRate * 4;
+            var d = new float[n];
+            var rng = new System.Random(5);
+            float lp = 0f;
+            for (int i = 0; i < n; i++)
+            {
+                float t = i / (float)SampleRate;
+                float w = (float)rng.NextDouble() * 2f - 1f;
+                lp += (w - lp) * 0.012f;
+                float swell = 0.55f + 0.45f * Mathf.Sin(2f * Mathf.PI * 0.5f * t); // 2 whole cycles in 4 s
+                d[i] = (lp * 4.2f + 0.2f * Mathf.Sin(2f * Mathf.PI * 40f * t)) * swell * 0.45f;
+            }
+            return d;
+        }
+
+        static float[] WaterLap()
+        {
+            int n = SampleRate * 4;
+            var d = new float[n];
+            var rng = new System.Random(21);
+            float lp = 0f, lp2 = 0f;
+            for (int i = 0; i < n; i++)
+            {
+                float t = i / (float)SampleRate;
+                float w = (float)rng.NextDouble() * 2f - 1f;
+                lp += (w - lp) * 0.06f;
+                lp2 += (lp - lp2) * 0.2f;
+                float lfo = 0.6f + 0.4f * Mathf.Sin(2f * Mathf.PI * 0.75f * t); // 3 whole cycles in 4 s
+                d[i] = lp2 * 2.2f * lfo * 0.5f;
+            }
+            Crossfade(d, SampleRate / 8);
+            return d;
+        }
+
+        static float[] Wind()
+        {
+            int n = SampleRate * 4;
+            var d = new float[n];
+            var rng = new System.Random(8);
+            float lp = 0f;
+            for (int i = 0; i < n; i++)
+            {
+                float t = i / (float)SampleRate;
+                float w = (float)rng.NextDouble() * 2f - 1f;
+                lp += (w - lp) * 0.03f;
+                float gust = 0.5f + 0.5f * Mathf.Sin(2f * Mathf.PI * 0.25f * t); // 1 whole cycle
+                d[i] = lp * 2.4f * (0.35f + 0.65f * gust) * 0.4f;
+            }
+            Crossfade(d, SampleRate / 8);
             return d;
         }
 

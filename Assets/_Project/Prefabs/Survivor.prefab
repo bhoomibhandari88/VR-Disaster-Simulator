@@ -1366,10 +1366,11 @@ MonoBehaviour:
   mission: {fileID: 0}
   findDistance: 7
   findViewAngle: 70
-  assessSeconds: 2.5
+  assessSeconds: 1.5
   walkSpeed: 1.5
   followDistance: 1.8
   requiresObjective: 
+  blockedMessage: Path blocked. Clear the passage first.
   vulnerability: 0.6
 --- !u!114 &6346373970716100269
 MonoBehaviour:

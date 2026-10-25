@@ -27,13 +27,17 @@ namespace RescueSim.EditorTools
     /// One-click generator for every scene and asset the game needs. Safe to re-run: scenes and prefabs are regenerated,
     /// the original Tirgames asset pack and its sample scene are never modified.
     /// </summary>
-    public static class SceneBuilder
+    public static partial class SceneBuilder
     {
         const string PackScene = "Assets/TirgamesAssets/Factory/Scenes/FactoryNight.unity";
         const string RigPrefab = "Assets/Samples/XR Interaction Toolkit/3.6.1/Starter Assets/Prefabs/XR Origin (XR Rig).prefab";
         public const string MenuScenePath = ScenesDir + "/MainMenu.unity";
         public const string MissionScenePath = ScenesDir + "/FactoryRescue.unity";
         public const string MissionAssetPath = DataDir + "/Mission_NightShiftFactoryFire.asset";
+        public const string QuakeScenePath = ScenesDir + "/EarthquakeRescue.unity";
+        public const string FloodScenePath = ScenesDir + "/FloodEvacuation.unity";
+        public const string QuakeAssetPath = DataDir + "/Mission_EarthquakeRescue.asset";
+        public const string FloodAssetPath = DataDir + "/Mission_FloodEvacuation.asset";
 
         // Key world positions (the hall runs along Z, floor at Y=0).
         static readonly Vector3 PlayerStart = new Vector3(-11.4f, 0f, 24.5f);
@@ -50,18 +54,46 @@ namespace RescueSim.EditorTools
         {
             ResetCache();
             EnsureDir(ScenesDir); EnsureDir(DataDir); EnsureDir(PrefabsDir); EnsureDir(MaterialsDir);
-            var mission = CreateMission();
+            var factory = CreateMission();
+            var quake = CreateQuakeMission();
+            var flood = CreateFloodMission();
             Prefabs.Fire(); Prefabs.GasLeak(); Prefabs.Survivor(); Prefabs.DebrisBlock();
             AssetDatabase.SaveAssets();
-            BuildMenu(mission);
-            BuildMission(mission);
+            BuildMenu();
+            BuildMission(factory);
+            BuildEarthquake();
+            BuildFlood();
+            RegisterScenes();
+            AssetDatabase.SaveAssets();
+            Debug.Log("[SceneBuilder] Done. Scenes: MainMenu, FactoryRescue, EarthquakeRescue, FloodEvacuation (added to Build Settings).");
+        }
+
+        [MenuItem("Rescue Sim/Build/New Stages Only (Menu, Earthquake, Flood)")]
+        public static void BuildNewStagesOnly()
+        {
+            ResetCache();
+            EnsureDir(ScenesDir); EnsureDir(DataDir); EnsureDir(PrefabsDir); EnsureDir(MaterialsDir);
+            CreateMission(); CreateQuakeMission(); CreateFloodMission();
+            if (AssetDatabase.LoadAssetAtPath<GameObject>(PrefabsDir + "/Survivor.prefab") == null)
+            { Prefabs.Fire(); Prefabs.GasLeak(); Prefabs.Survivor(); Prefabs.DebrisBlock(); }
+            AssetDatabase.SaveAssets();
+            BuildMenu();
+            BuildEarthquake();
+            BuildFlood();
+            RegisterScenes();
+            AssetDatabase.SaveAssets();
+            Debug.Log("[SceneBuilder] Rebuilt MainMenu, EarthquakeRescue, FloodEvacuation.");
+        }
+
+        static void RegisterScenes()
+        {
             EditorBuildSettings.scenes = new[]
             {
                 new EditorBuildSettingsScene(MenuScenePath, true),
-                new EditorBuildSettingsScene(MissionScenePath, true)
+                new EditorBuildSettingsScene(MissionScenePath, true),
+                new EditorBuildSettingsScene(QuakeScenePath, true),
+                new EditorBuildSettingsScene(FloodScenePath, true)
             };
-            AssetDatabase.SaveAssets();
-            Debug.Log("[SceneBuilder] Done. Scenes: MainMenu, FactoryRescue (added to Build Settings).");
         }
 
         // ---- Mission data ---------------------------------------------------------------------
@@ -71,17 +103,20 @@ namespace RescueSim.EditorTools
             var m = AssetDatabase.LoadAssetAtPath<MissionDefinition>(MissionAssetPath);
             if (m == null) { m = ScriptableObject.CreateInstance<MissionDefinition>(); AssetDatabase.CreateAsset(m, MissionAssetPath); }
             m.missionId = "factory-fire-night-shift";
-            m.title = "Night Shift: Factory Fire";
+            m.stageIndex = 0; m.sceneName = "FactoryRescue"; m.usesExposure = true;
+            m.accent = new Color(1f, 0.5f, 0.1f);
+            m.title = "Factory Fire Rescue";
             m.tagline = "A transformer fire and a gas leak have trapped your crew in Hall 1.";
+            m.cardBlurb = "Cut the power, shut off the gas, put out the fire and lead three workers out of the smoke.";
             m.briefing =
-                "A transformer fire and a gas leak have started in Hall 1. Part of the partition wall has collapsed, and three workers are unaccounted for.\n\n" +
-                "1. Cut main power at the breaker on the east wall before you spray the electrical fire.\n" +
-                "2. Close the gas shutoff valve: hold GRIP on the valve wheel until it is fully shut.\n" +
-                "3. Grab the extinguisher, squeeze TRIGGER and sweep the base of the flames.\n" +
-                "4. Pull the fallen debris out of the collapsed passage.\n" +
-                "5. Find every survivor, hold GRIP on them to check them, then lead them to the assembly point by the entrance.\n\n" +
-                "Smoke and fumes build up exposure. Raise your left wrist to see time, exposure and the checklist.";
-            m.timeLimitSeconds = 480f;
+                "A transformer fire and a gas leak have started in Hall 1. Part of the wall has collapsed and three workers are unaccounted for.\n\n" +
+                "1. Point at the main breaker (orange marker) and squeeze GRIP to cut power.\n" +
+                "2. Hold GRIP on the gas valve wheel until it is shut.\n" +
+                "3. Grab the extinguisher with GRIP, squeeze TRIGGER and sweep the flames.\n" +
+                "4. Grab the fallen debris and pull it out of the gap.\n" +
+                "5. Find every worker, hold GRIP on them to assist, then lead them to the green assembly point.\n\n" +
+                "Raise your left wrist for the checklist. Smoke builds up exposure, so keep moving.";
+            m.timeLimitSeconds = 600f;
             m.exposureRecoveryPerSecond = 0.04f;
             m.objectives = new List<MissionDefinition.ObjectiveDefinition>
             {
@@ -190,74 +225,6 @@ namespace RescueSim.EditorTools
             return s;
         }
 
-        // ---- Main menu ------------------------------------------------------------------------
-
-        static void BuildMenu(MissionDefinition mission)
-        {
-            var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-            mission = AssetDatabase.LoadAssetAtPath<MissionDefinition>(MissionAssetPath);
-            SetSkybox();
-            RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
-            RenderSettings.ambientLight = new Color(0.12f, 0.13f, 0.16f);
-
-            var rig = AddRig(Vector3.zero, 0f);
-
-            // Stage: floor, back wall, a few pack props and warm light.
-            var floorMat = Lit("Mat_MenuFloor", new Color(0.13f, 0.13f, 0.14f), 0.35f);
-            var wallMat = Lit("Mat_MenuWall", new Color(0.2f, 0.2f, 0.22f), 0.1f);
-            var stage = new GameObject("Stage").transform;
-            Prim(PrimitiveType.Cube, "Floor", stage, new Vector3(0, -0.05f, 4f), new Vector3(24f, 0.1f, 24f), floorMat, true);
-            Prim(PrimitiveType.Cube, "BackWall", stage, new Vector3(0, 3f, 9f), new Vector3(24f, 6f, 0.3f), wallMat);
-            Prim(PrimitiveType.Cube, "LeftWall", stage, new Vector3(-8f, 3f, 4f), new Vector3(0.3f, 6f, 24f), wallMat);
-            Prim(PrimitiveType.Cube, "RightWall", stage, new Vector3(8f, 3f, 4f), new Vector3(0.3f, 6f, 24f), wallMat);
-            PlaceProp(stage, "Barrel01a", new Vector3(-3.2f, 0f, 6.5f), 20f);
-            PlaceProp(stage, "Barrel01b", new Vector3(-2.4f, 0f, 7.2f), 70f);
-            PlaceProp(stage, "Barrel01c", new Vector3(3.4f, 0f, 6.8f), 120f);
-            PlaceProp(stage, "Barrel01a", new Vector3(4.1f, 0f, 6.0f), 10f);
-            PlaceProp(stage, "MetalCabinet01_1", new Vector3(6.2f, 0f, 7.6f), 190f);
-            PlaceProp(stage, "PowerBox01_1", new Vector3(-6.3f, 0f, 7.9f), 180f);
-
-            var warm = new GameObject("KeyLight").AddComponent<Light>();
-            warm.type = LightType.Point; warm.color = new Color(1f, 0.7f, 0.4f); warm.intensity = 4f; warm.range = 14f; warm.shadows = LightShadows.None;
-            warm.transform.position = new Vector3(0, 3.6f, 3.5f);
-            var red = new GameObject("AlarmLight").AddComponent<Light>();
-            red.type = LightType.Point; red.color = new Color(1f, 0.15f, 0.1f); red.intensity = 2.5f; red.range = 9f; red.shadows = LightShadows.None;
-            red.transform.position = new Vector3(0, 2.6f, 8f);
-
-            // Title on the back wall.
-            var titleCanvas = UIFactory.CreateWorldCanvas("Title", new Vector2(1600, 300), stage, 0.004f, false);
-            titleCanvas.transform.position = new Vector3(0, 4.3f, 8.8f);
-            UIFactory.AddText(titleCanvas.transform, "FACTORY RESCUE VR", 160f, new Vector2(0, -10), new Vector2(1560, 200), TextAlignmentOptions.Center, UIFactory.Accent, FontStyles.Bold);
-            UIFactory.AddText(titleCanvas.transform, "Fire and collapse response simulator", 60f, new Vector2(0, -210), new Vector2(1560, 80), TextAlignmentOptions.Center, UIFactory.TextDim);
-
-            // Main panel.
-            var uiRoot = new GameObject("UI").transform;
-            var main = UIFactory.CreateWorldCanvas("MainPanel", new Vector2(1000, 760), uiRoot);
-            var mainPanel = main.gameObject.AddComponent<VRPanel>();
-            UIFactory.AddBackground(main.transform, UIFactory.Panel);
-            UIFactory.AddText(main.transform, "MISSION", 30f, new Vector2(0, -30), new Vector2(900, 40), TextAlignmentOptions.Center, UIFactory.TextDim, FontStyles.Bold);
-            var title = UIFactory.AddText(main.transform, "", 58f, new Vector2(0, -75), new Vector2(920, 80), TextAlignmentOptions.Center, UIFactory.Accent, FontStyles.Bold);
-            var tag = UIFactory.AddText(main.transform, "", 34f, new Vector2(0, -170), new Vector2(880, 110), TextAlignmentOptions.Center, UIFactory.TextMain);
-            UIFactory.AddText(main.transform, "Aim with either controller and squeeze the trigger to select.\nGrip grabs and holds. Left stick moves, right stick turns.", 27f,
-                new Vector2(0, -300), new Vector2(880, 90), TextAlignmentOptions.Center, UIFactory.TextDim);
-            var start = UIFactory.AddButton(main.transform, "Start Mission", new Vector2(0, -420), new Vector2(560, 100), null, UIFactory.AccentDim, 42f);
-            var settingsBtn = UIFactory.AddButton(main.transform, "Settings", new Vector2(0, -540), new Vector2(560, 90), null, UIFactory.Button, 38f);
-            var quit = UIFactory.AddButton(main.transform, "Quit", new Vector2(0, -650), new Vector2(560, 80), null, UIFactory.Button, 34f);
-
-            var sc = UIFactory.CreateWorldCanvas("SettingsPanel", new Vector2(1000, 760), uiRoot);
-            var settings = SettingsPanel.Build(sc);
-
-            var menu = rig.transitions.gameObject.AddComponent<MainMenuController>();
-            Ref(menu, "mission", mission); Ref(menu, "head", rig.cam.transform); Ref(menu, "transitions", rig.transitions);
-            Ref(menu, "mainPanel", mainPanel); Ref(menu, "settingsPanel", settings);
-            Ref(menu, "startButton", start); Ref(menu, "settingsButton", settingsBtn); Ref(menu, "quitButton", quit);
-            Ref(menu, "missionTitle", title); Ref(menu, "missionTagline", tag);
-
-            Ambient("AmbientHum", SpatialSound.Cue.AmbientHum, 0.22f, Vector3.zero, false);
-
-            EditorSceneManager.SaveScene(scene, MenuScenePath);
-        }
-
         static void PlaceProp(Transform parent, string prefabName, Vector3 pos, float yaw)
         {
             var guids = AssetDatabase.FindAssets(prefabName + " t:Prefab", new[] { "Assets/TirgamesAssets/Factory/Prefabs" });
@@ -358,7 +325,7 @@ namespace RescueSim.EditorTools
             Refs(mission, "survivors", survivors);
 
             // UI.
-            var ui = BuildMissionUI(rig, mission, vitals, head);
+            var ui = BuildMissionUI(rig, mission, head);
             BuildWristHud(rig, mission, vitals, head);
             BuildToast(mission, head);
             BuildMarkers(mission, head);
@@ -692,52 +659,7 @@ namespace RescueSim.EditorTools
 
         // ---- UI -------------------------------------------------------------------------------
 
-        static MissionUI BuildMissionUI(Rig rig, MissionController mission, PlayerVitals vitals, Transform head)
-        {
-            var uiRoot = new GameObject("UI").transform;
-
-            var briefing = UIFactory.CreateWorldCanvas("BriefingPanel", new Vector2(1100, 860), uiRoot);
-            var briefingPanel = briefing.gameObject.AddComponent<VRPanel>();
-            UIFactory.AddBackground(briefing.transform, UIFactory.Panel);
-            UIFactory.AddText(briefing.transform, "MISSION BRIEFING", 30f, new Vector2(0, -26), new Vector2(1000, 40), TextAlignmentOptions.Center, UIFactory.TextDim, FontStyles.Bold);
-            var bTitle = UIFactory.AddText(briefing.transform, "", 54f, new Vector2(0, -66), new Vector2(1020, 80), TextAlignmentOptions.Center, UIFactory.Accent, FontStyles.Bold);
-            var bBody = UIFactory.AddText(briefing.transform, "", 30f, new Vector2(0, -160), new Vector2(980, 540), TextAlignmentOptions.TopLeft, UIFactory.TextMain);
-            var begin = UIFactory.AddButton(briefing.transform, "Begin Mission", new Vector2(0, -740), new Vector2(560, 100), null, UIFactory.AccentDim, 42f);
-
-            var pause = UIFactory.CreateWorldCanvas("PausePanel", new Vector2(800, 640), uiRoot);
-            var pausePanel = pause.gameObject.AddComponent<VRPanel>();
-            UIFactory.AddBackground(pause.transform, UIFactory.Panel);
-            UIFactory.AddText(pause.transform, "PAUSED", 64f, new Vector2(0, -40), new Vector2(700, 90), TextAlignmentOptions.Center, UIFactory.Accent, FontStyles.Bold);
-            var resume = UIFactory.AddButton(pause.transform, "Resume", new Vector2(0, -160), new Vector2(520, 90), null, UIFactory.AccentDim, 40f);
-            var pSettings = UIFactory.AddButton(pause.transform, "Settings", new Vector2(0, -270), new Vector2(520, 90), null, UIFactory.Button, 38f);
-            var pRestart = UIFactory.AddButton(pause.transform, "Restart Mission", new Vector2(0, -380), new Vector2(520, 90), null, UIFactory.Button, 38f);
-            var pMenu = UIFactory.AddButton(pause.transform, "Main Menu", new Vector2(0, -490), new Vector2(520, 90), null, UIFactory.Button, 38f);
-
-            var settingsCanvas = UIFactory.CreateWorldCanvas("SettingsPanel", new Vector2(1000, 760), uiRoot);
-            var settings = SettingsPanel.Build(settingsCanvas);
-
-            var results = UIFactory.CreateWorldCanvas("ResultsPanel", new Vector2(1100, 900), uiRoot);
-            var resultsPanel = results.gameObject.AddComponent<VRPanel>();
-            UIFactory.AddBackground(results.transform, UIFactory.Panel);
-            var rTitle = UIFactory.AddText(results.transform, "", 64f, new Vector2(0, -40), new Vector2(1000, 90), TextAlignmentOptions.Center, UIFactory.Accent, FontStyles.Bold);
-            var rBody = UIFactory.AddText(results.transform, "", 34f, new Vector2(0, -150), new Vector2(980, 560), TextAlignmentOptions.TopLeft, UIFactory.TextMain);
-            var replay = UIFactory.AddButton(results.transform, "Replay", new Vector2(-280, -760), new Vector2(480, 100), null, UIFactory.AccentDim, 40f);
-            var rMenu = UIFactory.AddButton(results.transform, "Main Menu", new Vector2(280, -760), new Vector2(480, 100), null, UIFactory.Button, 40f);
-
-            var sys = rig.transitions.gameObject;
-            var mui = sys.AddComponent<MissionUI>();
-            Ref(mui, "mission", mission); Ref(mui, "head", head); Ref(mui, "transitions", rig.transitions);
-            Ref(mui, "briefingPanel", briefingPanel); Ref(mui, "pausePanel", pausePanel); Ref(mui, "settingsPanel", settings); Ref(mui, "resultsPanel", resultsPanel);
-            Ref(mui, "briefingTitle", bTitle); Ref(mui, "briefingBody", bBody); Ref(mui, "beginButton", begin);
-            Ref(mui, "resumeButton", resume); Ref(mui, "pauseSettingsButton", pSettings); Ref(mui, "pauseRestartButton", pRestart); Ref(mui, "pauseMenuButton", pMenu);
-            Ref(mui, "resultsTitle", rTitle); Ref(mui, "resultsBody", rBody); Ref(mui, "replayButton", replay); Ref(mui, "resultsMenuButton", rMenu);
-
-            var pi = sys.AddComponent<PauseInput>();
-            pi.Configure(mui);
-            return mui;
-        }
-
-        static void BuildWristHud(Rig rig, MissionController mission, PlayerVitals vitals, Transform head)
+        static void BuildWristHud(Rig rig, MissionController mission, PlayerVitals vitals, Transform head, bool showExposure = true)
         {
             var go = new GameObject("WristHud");
             var canvas = UIFactory.CreateWorldCanvas("Canvas", new Vector2(520, 400), go.transform, 0.0004f, false);
@@ -745,9 +667,10 @@ namespace RescueSim.EditorTools
             group.alpha = 0f;
             UIFactory.AddBackground(canvas.transform, new Color(0.04f, 0.06f, 0.09f, 0.9f));
             var timer = UIFactory.AddText(canvas.transform, "08:00", 70f, new Vector2(0, -6), new Vector2(480, 80), TextAlignmentOptions.Center, UIFactory.TextMain, FontStyles.Bold);
-            UIFactory.AddText(canvas.transform, "EXPOSURE", 22f, new Vector2(0, -86), new Vector2(480, 28), TextAlignmentOptions.Center, UIFactory.TextDim, FontStyles.Bold);
+            var expLabel = UIFactory.AddText(canvas.transform, "EXPOSURE", 22f, new Vector2(0, -86), new Vector2(480, 28), TextAlignmentOptions.Center, UIFactory.TextDim, FontStyles.Bold);
             var bar = UIFactory.AddBar(canvas.transform, new Vector2(0, -116), new Vector2(460, 22), UIFactory.Good, "Exposure");
             var obj = UIFactory.AddText(canvas.transform, "", 27f, new Vector2(0, -150), new Vector2(480, 240), TextAlignmentOptions.TopLeft, UIFactory.TextMain);
+            if (!showExposure) { bar.transform.parent.gameObject.SetActive(false); expLabel.gameObject.SetActive(false); obj.rectTransform.anchoredPosition = new Vector2(0, -100); }
             var hud = go.AddComponent<WristHud>();
             hud.Configure(mission, vitals, head, rig.left != null ? rig.left : head, group, timer, obj, bar);
         }

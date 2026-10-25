@@ -10,7 +10,13 @@ EditorBuildSettings:
     guid: ffa1298c108d64a3698fdb7b17a4ca3f
   - enabled: 1
     path: Assets/_Project/Scenes/FactoryRescue.unity
-    guid: 13af3ea70f92b4c84becb83e7a5f0533
+    guid: 5408a8328a73b4aa9ab963db28742fd9
+  - enabled: 1
+    path: Assets/_Project/Scenes/EarthquakeRescue.unity
+    guid: 44df7147947184b16b5f0d3ecd4e6520
+  - enabled: 1
+    path: Assets/_Project/Scenes/FloodEvacuation.unity
+    guid: fdc7fd3e5a230427c9b9f76fe7c56994
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}

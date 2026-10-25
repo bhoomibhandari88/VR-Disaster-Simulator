@@ -13,32 +13,37 @@ MonoBehaviour:
   m_Name: Mission_NightShiftFactoryFire
   m_EditorClassIdentifier: RescueSim.Runtime::RescueSim.Core.MissionDefinition
   missionId: factory-fire-night-shift
-  title: 'Night Shift: Factory Fire'
+  title: Factory Fire Rescue
   tagline: A transformer fire and a gas leak have trapped your crew in Hall 1.
   briefing: 'A transformer fire and a gas leak have started in Hall 1. Part of the
-    partition wall has collapsed, and three workers are unaccounted for.
+    wall has collapsed and three workers are unaccounted for.
 
 
-    1.
-    Cut main power at the breaker on the east wall before you spray the electrical
-    fire.
+    1. Point at the
+    main breaker (orange marker) and squeeze GRIP to cut power.
 
-    2. Close the gas shutoff valve: hold GRIP on the valve wheel until
-    it is fully shut.
+    2. Hold GRIP
+    on the gas valve wheel until it is shut.
 
-    3. Grab the extinguisher, squeeze TRIGGER and sweep the
-    base of the flames.
+    3. Grab the extinguisher with GRIP,
+    squeeze TRIGGER and sweep the flames.
 
-    4. Pull the fallen debris out of the collapsed passage.
+    4. Grab the fallen debris and pull
+    it out of the gap.
 
-    5.
-    Find every survivor, hold GRIP on them to check them, then lead them to the assembly
-    point by the entrance.
+    5. Find every worker, hold GRIP on them to assist, then
+    lead them to the green assembly point.
 
 
-    Smoke and fumes build up exposure. Raise your left
-    wrist to see time, exposure and the checklist.'
-  timeLimitSeconds: 480
+    Raise your left wrist for the checklist.
+    Smoke builds up exposure, so keep moving.'
+  stageIndex: 0
+  sceneName: FactoryRescue
+  cardBlurb: Cut the power, shut off the gas, put out the fire and lead three workers
+    out of the smoke.
+  accent: {r: 1, g: 0.5, b: 0.1, a: 1}
+  usesExposure: 1
+  timeLimitSeconds: 600
   exposureRecoveryPerSecond: 0.04
   objectives:
   - id: power

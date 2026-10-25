@@ -13,5 +13,8 @@ namespace RescueSim.Core
         public const string Route = "route";
         public const string Locate = "locate";
         public const string Evacuate = "evacuate";
+        public const string Enter = "enter";
+        public const string SafeRoute = "safe-route";
+        public const string Equip = "equip";
     }
 }

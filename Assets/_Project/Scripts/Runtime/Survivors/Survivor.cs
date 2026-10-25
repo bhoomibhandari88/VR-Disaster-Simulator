@@ -39,11 +39,13 @@ namespace RescueSim.Survivors
         [Header("Behaviour")]
         [SerializeField, Min(1f)] float findDistance = 7f;
         [SerializeField, Range(10f, 120f)] float findViewAngle = 70f;
-        [SerializeField, Min(0.5f)] float assessSeconds = 2.5f;
+        [SerializeField, Min(0.5f)] float assessSeconds = 1.5f;
         [SerializeField, Min(0.2f)] float walkSpeed = 1.5f;
         [SerializeField, Min(0.5f)] float followDistance = 1.8f;
         [Tooltip("Objective that must be complete before this survivor can move (e.g. the passage is cleared).")]
         [SerializeField] string requiresObjective = "";
+        [Tooltip("Shown when the player tries to assist before requiresObjective is complete.")]
+        [SerializeField] string blockedMessage = "Path blocked. Clear the passage first.";
         [Tooltip("Health lost per second per unit of hazard exposure rate.")]
         [SerializeField, Min(0f)] float vulnerability = 0.6f;
 
@@ -160,7 +162,7 @@ namespace RescueSim.Survivors
                     if (!_blockedWarned)
                     {
                         _blockedWarned = true;
-                        if (statusLabel != null) statusLabel.text = "Path blocked. Clear the passage first.";
+                        if (statusLabel != null) statusLabel.text = blockedMessage;
                     }
                     return;
                 }
@@ -297,7 +299,7 @@ namespace RescueSim.Survivors
                 statusLabel.text = State switch
                 {
                     SurvivorState.Unfound => "",
-                    SurvivorState.Trapped => _assess > 0f ? "Checking..." : "Hold GRIP to check on them",
+                    SurvivorState.Trapped => _assess > 0f ? "Checking..." : "Hold GRIP to assist",
                     SurvivorState.Following => "Follow me out",
                     SurvivorState.Rescued => "Safe",
                     _ => "Lost"

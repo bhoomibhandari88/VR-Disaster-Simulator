@@ -58,7 +58,8 @@ namespace RescueSim.Core
             var r = new ScoreResult { completed = input.completed };
 
             float survivorFraction = input.survivorsTotal > 0 ? Mathf.Clamp01((float)input.survivorsRescued / input.survivorsTotal) : 0f;
-            float hazardFraction = input.hazardsTotal > 0 ? Mathf.Clamp01((float)input.hazardsNeutralized / input.hazardsTotal) : 0f;
+            // Stages without hazards award the hazard share automatically so every stage can reach a full score.
+            float hazardFraction = input.hazardsTotal > 0 ? Mathf.Clamp01((float)input.hazardsNeutralized / input.hazardsTotal) : (input.completed ? 1f : 0f);
             float timeFraction = input.timeLimit > 0f ? Mathf.Clamp01(input.timeRemaining / input.timeLimit) : 0f;
 
             r.survivorPoints = Mathf.RoundToInt(w.survivorPoints * survivorFraction);

@@ -13,7 +13,9 @@
         "Unity.InputSystem",
         "Unity.TextMeshPro",
         "Unity.AI.Navigation",
-        "Unity.ugui"
+        "Unity.ugui",
+        "UnityEditor.TestRunner",
+        "UnityEngine.TestRunner"
     ],
     "includePlatforms": [
         "Editor"

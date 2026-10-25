@@ -68,7 +68,11 @@ namespace RescueSim.Tests
         public void ZeroTotals_DoNotDivideByZero()
         {
             var r = ScoreCalculator.Calculate(new ScoreInput { completed = true }, ScoreWeights.Default);
-            Assert.AreEqual(0, r.total);
+            // No survivors/time limit: nothing to divide by. A hazard-free stage that is completed still earns the hazard share.
+            Assert.AreEqual(0, r.survivorPoints);
+            Assert.AreEqual(0, r.timeBonus);
+            Assert.AreEqual(r.hazardPoints, r.total);
+            Assert.AreEqual(0, ScoreCalculator.Calculate(new ScoreInput { completed = false }, ScoreWeights.Default).hazardPoints);
         }
 
         [Test]

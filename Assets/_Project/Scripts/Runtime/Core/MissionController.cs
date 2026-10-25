@@ -110,7 +110,7 @@ namespace RescueSim.Core
             if (State != MissionState.Briefing) return;
             if (vitals != null) { vitals.ResetVitals(); vitals.RecoveryPerSecond = mission.exposureRecoveryPerSecond; vitals.IsTracking = true; }
             SetState(MissionState.Active);
-            RaiseFeedback("Mission started. Stay low on exposure and work the checklist.", FeedbackKind.Info);
+            RaiseFeedback(mission.usesExposure ? "Mission started. Work the checklist on your wrist." : "Mission started. Follow the glowing markers.", FeedbackKind.Info);
         }
 
         public void Pause()
@@ -216,7 +216,7 @@ namespace RescueSim.Core
         {
             SurvivorsFound++;
             UpdateSurvivorProgress();
-            RaiseFeedback($"Survivor located ({SurvivorsFound}/{SurvivorsTotal}). Hold to check on them, then lead them out.", FeedbackKind.Info);
+            RaiseFeedback($"Survivor located ({SurvivorsFound}/{SurvivorsTotal}). Hold GRIP on them to assist, then lead them out.", FeedbackKind.Info);
             if (SurvivorsFound >= SurvivorsTotal) Objectives.Complete(ObjectiveIds.Locate);
         }
 

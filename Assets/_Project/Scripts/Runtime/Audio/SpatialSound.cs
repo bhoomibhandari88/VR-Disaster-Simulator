@@ -9,7 +9,9 @@ namespace RescueSim.Audio
         public enum Cue
         {
             None, Click, Clunk, Confirm, Success, Failure, Warning, Alarm, DistressWhistle,
-            Hiss, Crackle, ElectricBuzz, AmbientHum, Spray, Cough
+            Hiss, Crackle, ElectricBuzz, AmbientHum, Spray, Cough,
+            // Appended (values are serialized in scenes: never reorder).
+            Rain, Rumble, WaterLap, Wind
         }
 
         [SerializeField] Cue loopCue = Cue.None;
