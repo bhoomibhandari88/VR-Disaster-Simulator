@@ -32,6 +32,7 @@ namespace RescueSim.UI
         [SerializeField] Button helpBackButton;
         [SerializeField] Button settingsButton;
         [SerializeField] Button quitButton;
+        [SerializeField] Button triageButton;
         [SerializeField] Button resetButton;
         [SerializeField] Toggle demoToggle;
         [SerializeField] TMP_Text progressText;
@@ -55,6 +56,7 @@ namespace RescueSim.UI
             helpBackButton?.onClick.AddListener(CloseHelp);
             settingsButton?.onClick.AddListener(OpenSettings);
             quitButton?.onClick.AddListener(Quit);
+            triageButton?.onClick.AddListener(OpenTriage);
             resetButton?.onClick.AddListener(ResetProgress);
             demoToggle?.onValueChanged.AddListener(OnDemoToggled);
             settingsPanel?.BackButton?.onClick.AddListener(CloseSettings);
@@ -68,6 +70,7 @@ namespace RescueSim.UI
             helpBackButton?.onClick.RemoveListener(CloseHelp);
             settingsButton?.onClick.RemoveListener(OpenSettings);
             quitButton?.onClick.RemoveListener(Quit);
+            triageButton?.onClick.RemoveListener(OpenTriage);
             resetButton?.onClick.RemoveListener(ResetProgress);
             demoToggle?.onValueChanged.RemoveListener(OnDemoToggled);
             settingsPanel?.BackButton?.onClick.RemoveListener(CloseSettings);
@@ -131,5 +134,6 @@ namespace RescueSim.UI
         void OpenSettings() { mainPanel.Hide(); settingsPanel.ShowInFrontOf(head); }
         void CloseSettings() { settingsPanel.Hide(); mainPanel.ShowInFrontOf(head); }
         void Quit() => transitions?.Quit();
+        void OpenTriage() => transitions?.Load(StageCatalog.TriageScene);
     }
 }

@@ -43,6 +43,15 @@ namespace RescueSim.EditorTools
                         new V("van", new Vector3(0, 1.7f, 0), new Vector3(-3.4f, 1.2f, -9.5f), 80),
                     };
                     break;
+                case "TriageSimulation":
+                    views = new[]
+                    {
+                        new V("yard", new Vector3(0, 1.7f, 0.5f), new Vector3(0, 1.0f, 10), 75),
+                        new V("aerial", new Vector3(0, 16, -8), new Vector3(0, 0, 8), 65),
+                        new V("close", new Vector3(-3.5f, 1.7f, 5.5f), new Vector3(-3.5f, 0.3f, 8.5f), 70),
+                        new V("panel", new Vector3(0, 1.7f, 7), new Vector3(0, 1.6f, 9.2f), 70),
+                    };
+                    break;
                 case "MainMenu":
                     views = new[] { new V("menu", new Vector3(0, 1.7f, 0), new Vector3(0, 1.7f, 2.3f), 75) };
                     break;

@@ -375,6 +375,7 @@ namespace RescueSim.EditorTools
             var settingsBtn = UIFactory.AddButton(main.transform, "Settings", new Vector2(-330, -762), new Vector2(240, 84), null, UIFactory.Button, 32f);
             var demo = UIFactory.AddToggle(main.transform, "Demo: unlock all stages", new Vector2(20, -762), new Vector2(420, 84), CampaignProgress.UnlockAll, null);
             var reset = UIFactory.AddButton(main.transform, "Reset progress", new Vector2(370, -762), new Vector2(240, 84), null, UIFactory.Button, 28f);
+            var triage = UIFactory.AddButton(main.transform, "Triage Study", new Vector2(585, -22), new Vector2(300, 64), null, UIFactory.AccentDim, 28f);
             var quit = UIFactory.AddButton(main.transform, "Quit", new Vector2(610, -762), new Vector2(200, 84), null, UIFactory.Button, 32f);
 
             // ---- Help panel ----
@@ -401,7 +402,7 @@ namespace RescueSim.EditorTools
             Ref(menu, "head", rig.cam.transform); Ref(menu, "transitions", rig.transitions);
             Ref(menu, "mainPanel", mainPanel); Ref(menu, "settingsPanel", settings); Ref(menu, "helpPanel", helpPanel);
             Ref(menu, "helpButton", help); Ref(menu, "helpBackButton", helpBack); Ref(menu, "settingsButton", settingsBtn);
-            Ref(menu, "quitButton", quit); Ref(menu, "resetButton", reset); Ref(menu, "demoToggle", demo);
+            Ref(menu, "quitButton", quit); Ref(menu, "triageButton", triage); Ref(menu, "resetButton", reset); Ref(menu, "demoToggle", demo);
             Ref(menu, "progressText", progressText); Ref(menu, "progressFill", progressFill); Ref(menu, "messageText", message);
             var so = new SerializedObject(menu);
             var list = so.FindProperty("cards");

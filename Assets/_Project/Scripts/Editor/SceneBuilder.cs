@@ -63,9 +63,10 @@ namespace RescueSim.EditorTools
             BuildMission(factory);
             BuildEarthquake();
             BuildFlood();
+            BuildTriage();
             RegisterScenes();
             AssetDatabase.SaveAssets();
-            Debug.Log("[SceneBuilder] Done. Scenes: MainMenu, FactoryRescue, EarthquakeRescue, FloodEvacuation (added to Build Settings).");
+            Debug.Log("[SceneBuilder] Done. Scenes: MainMenu, FactoryRescue, EarthquakeRescue, FloodEvacuation, TriageSimulation (added to Build Settings).");
         }
 
         [MenuItem("Rescue Sim/Build/New Stages Only (Menu, Earthquake, Flood)")]
@@ -80,9 +81,10 @@ namespace RescueSim.EditorTools
             BuildMenu();
             BuildEarthquake();
             BuildFlood();
+            BuildTriage();
             RegisterScenes();
             AssetDatabase.SaveAssets();
-            Debug.Log("[SceneBuilder] Rebuilt MainMenu, EarthquakeRescue, FloodEvacuation.");
+            Debug.Log("[SceneBuilder] Rebuilt MainMenu, EarthquakeRescue, FloodEvacuation, TriageSimulation.");
         }
 
         static void RegisterScenes()
@@ -92,7 +94,8 @@ namespace RescueSim.EditorTools
                 new EditorBuildSettingsScene(MenuScenePath, true),
                 new EditorBuildSettingsScene(MissionScenePath, true),
                 new EditorBuildSettingsScene(QuakeScenePath, true),
-                new EditorBuildSettingsScene(FloodScenePath, true)
+                new EditorBuildSettingsScene(FloodScenePath, true),
+                new EditorBuildSettingsScene(TriageScenePath, true)
             };
         }
 

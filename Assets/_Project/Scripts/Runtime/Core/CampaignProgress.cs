@@ -7,6 +7,8 @@ namespace RescueSim.Core
     public static class StageCatalog
     {
         public const string MenuScene = "MainMenu";
+        /// <summary>Stand-alone START triage study scene. Not a campaign stage: no unlock, stars or progress.</summary>
+        public const string TriageScene = "TriageSimulation";
         public static readonly string[] Scenes = { "FactoryRescue", "EarthquakeRescue", "FloodEvacuation" };
         public static int Count => Scenes.Length;
 
