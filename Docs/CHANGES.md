@@ -22,3 +22,8 @@ Nothing has been pushed. No existing asset was deleted or replaced. All work is 
 ## Not committed on purpose
 - LFS-type binaries from the XRI sample (png/fbx/wav) and TextMesh Pro `EmojiOne.png`: the authoring VM has no git-lfs. Add them from a machine with Git LFS (`git add` then commit) before pushing.
 - `Library/`, `Temp/`, `Logs/`, `UserSettings/`, `Builds/` (git-ignored).
+
+## Milestone 2: three-stage campaign
+- Added: `EarthquakeRescue` and `FloodEvacuation` scenes + mission assets, main-menu campaign (stage cards, locks, progress, settings, controls, demo unlock-all), shared briefing/HUD/results UI, `CampaignProgress`/`StageCatalog`/`StageScoring`, `WaterSurface`, `StarRating`, zone/pickup objectives, `RunTests` editor menu, new EditMode (57 total) and PlayMode (23 total) tests.
+- Changed: `SceneBuilder` split into partials; `VRPanel` placement; `ScoreCalculator` hazard-free scoring; `AndroidBuild` output now `DisasterResponseVR.apk`.
+- Nothing deleted. Nothing pushed.

@@ -1,12 +1,29 @@
-# Factory Rescue VR — Industrial Fire & Collapse Rescue Simulator
+# Disaster Response VR — Three-Stage Rescue Game
 
-A single-mission VR training-style game built in Unity 6 (6000.3.21f1, URP) for Meta Quest 3/3S, using the Tirgames factory asset pack.
-You enter a dark factory hall after a transformer fire, a gas leak and a partial wall collapse. Isolate the hazards, clear the blocked
-passage, find three trapped workers and lead them to the assembly point before time (8:00) or your exposure meter runs out.
+A short VR disaster-response game built in Unity 6 (6000.3.21f1, URP) for Meta Quest 3/3S, tested in Meta XR Simulator.
+Pick a stage from the main menu, read the briefing, complete 3–6 objectives, get a score out of 100 and 1–3 stars, and unlock the next stage.
 
-> **Status honesty**: see [`Docs/AUDIT.md`](Docs/AUDIT.md) for exactly what is *implemented*, what was *tested in Meta XR Simulator*, what has
-> *automated tests*, and what is **not verified on a physical headset** (nothing has been).
-> This is a game, not a medical or safety-certified training tool. Exposure/health values are game abstractions.
+| # | Stage | Scene | Theme |
+|---|---|---|---|
+| 1 | Factory Rescue | `FactoryRescue` | Cut power, shut the gas valve, extinguish fires, clear the collapse, rescue 3 workers |
+| 2 | Earthquake Rescue | `EarthquakeRescue` | Check zones, clear debris, find survivors and guide them out of a damaged building |
+| 3 | Flood Evacuation | `FloodEvacuation` | Rising water: collect supplies, reach high ground, escort survivors to the evacuation point |
+
+> **Status honesty**: see [`Docs/AUDIT.md`](Docs/AUDIT.md). Everything here is *implemented* and *auto-tested* (EditMode + PlayMode). The PlayMode
+> playthroughs drive real XR Interaction Toolkit select events, not a headset; manual simulator use was only partial. **Nothing is verified on a
+> physical headset** — comfort and performance on a real Quest are unknown.
+> This is a game, not a safety-certified training tool.
+
+## Controls (same in every stage)
+| Action | Quest controllers | Meta XR Simulator (keyboard profile) |
+|---|---|---|
+| Point / press UI | ray + **trigger** | aim with arrows, **T** |
+| Select / hold to assess a survivor | ray or near + **trigger/grip** (hold ~1.5 s) | T / U held |
+| Move | teleport and snap turn (thumbsticks) | W A S D / arrows |
+| Pause | left menu button | Esc |
+
+Help is also in the main menu (Controls). No hazard is an instant fail, and a waypoint guides you when you are lost.
+Stage 1 specifics: select the breaker lever to cut power, hold the gas valve wheel to close it, grab the extinguisher and squeeze the trigger to put out fires, carry debris out of the marked gap.
 
 ## Requirements
 - Unity **6000.3.21f1** (Unity 6.3 LTS) with **Android Build Support** (OpenJDK, SDK & NDK) for Quest builds.
@@ -16,9 +33,9 @@ passage, find three trapped workers and lead them to the assembly point before t
 
 ## Quick start (editor + Meta XR Simulator)
 1. Open the project in Unity 6000.3.21f1. Let packages resolve and scripts compile (console should show 0 errors).
-2. (Re)generate scenes if needed: **Rescue Sim ▸ Build ▸ Everything**. This builds `MainMenu` and `FactoryRescue`, prefabs, materials, the NavMesh and Build Settings.
+2. (Re)generate scenes if needed: **Rescue Sim ▸ Build ▸ Everything**. This builds `MainMenu`, `FactoryRescue`, `EarthquakeRescue`, `FloodEvacuation`, prefabs, materials, the NavMesh and Build Settings.
 3. Install/enable Meta XR Simulator and turn on "XR Simulator runtime enabled" (toggle top-left of the simulator app).
-4. Open `Assets/_Project/Scenes/FactoryRescue.unity` (or `MainMenu`) and press **Play**. The simulator window launches automatically.
+4. Open `Assets/_Project/Scenes/MainMenu.unity` (or any stage scene) and press **Play**. The simulator window launches automatically.
 5. Click once inside the simulator's headset view to give it keyboard focus.
 
 ### Meta XR Simulator keyboard controls (Keyboard and mouse profile, "same input for both sides")
@@ -35,39 +52,32 @@ passage, find three trapped workers and lead them to the assembly point before t
 
 Tips: aim the ray at a button by turning/pitching with the arrows (≈70°/s) or stepping back with S; clicking on a controller model in the simulator view selects that controller for manual posing, so click an empty area instead.
 
-## Gameplay
-Controls on Quest (Touch controllers): ray-point + **trigger** on menus; **grip** to grab / hold interactions; **trigger** while holding the extinguisher to spray; **left menu button** to pause; raise your **left wrist** to see the diegetic HUD (time, exposure, checklist).
-
-Mission checklist (all data-driven from `Assets/_Project/Data/Mission_NightShiftFactoryFire.asset`):
-1. **Cut main power** at the breaker on the east wall (select the lever). Spraying the electrical fire while power is live is a *mistake* (shock + penalty).
-2. **Close the gas shut-off valve** — hold grip on the valve wheel until fully shut. The gas cloud thins and then stops.
-3. **Extinguish the fires** — grab the extinguisher from the bench, squeeze the trigger, sweep the base of the flames. Fires regrow if abandoned.
-4. **Clear the collapsed passage** — grab and carry debris blocks out of the marked gap in the partition wall.
-5. **Locate** all three survivors (hold grip on them to assess) — two are behind the collapse.
-6. **Evacuate** them: they follow you; keep them out of smoke and lead them into the green assembly zone at the entrance.
-
-Scoring (0–1000): survivors 500 · hazards 300 · time bonus 200 (only on completion) · exposure penalty up to −150 · −25 per mistake. Ranks: S ≥ 900, A ≥ 750, B ≥ 550, C ≥ 350, D otherwise, INCOMPLETE if not finished. The results panel offers **Replay** and **Main Menu**.
-Settings (main menu / pause): snap/smooth turn, turn angle/speed, move speed, comfort vignette, master volume (stored in PlayerPrefs).
+## Campaign
+- **Main menu**: three stage cards (locked/unlocked, best score and stars), Controls, Settings (volume, comfort: snap/smooth turn, vignette), overall progress, and a **Demo: unlock all** option for assessors. Progress persists in PlayerPrefs.
+- **Each stage**: briefing panel → *Begin Mission* → consistent HUD (timer, objective checklist) → results screen with score /100, 1–3 stars and **Next / Retry / Menu**. Finishing stage 3 shows a campaign-complete screen.
+- **Stars** (`StageScoring`): ≥85 → 3, ≥60 → 2, otherwise 1; 0 if not completed. Completing stage N unlocks stage N+1.
 
 ## Project layout
 ```
 Assets/_Project/
-  Scripts/Runtime/{Core,Hazards,Interaction,Survivors,UI,Audio,Player}   # gameplay (assembly RescueSim.Runtime)
+  Scripts/Runtime/{Core,Hazards,Interaction,Survivors,UI,Audio,Player,World}   # gameplay (assembly RescueSim.Runtime)
   Scripts/Editor/                                                       # scene/prefab builder, XR+Android setup, Android build
-  Data/            MissionDefinition ScriptableObject
-  Scenes/          MainMenu, FactoryRescue (+ baked NavMesh)
+  Data/            one MissionDefinition ScriptableObject per stage
+  Scenes/          MainMenu, FactoryRescue, EarthquakeRescue, FloodEvacuation (+ baked NavMeshes)
   Prefabs/ Materials/ Shaders/                                           # generated + authored
   Tests/{EditMode,PlayMode}                                              # NUnit/Unity Test Framework suites
 Assets/TirgamesAssets/   original factory pack (materials upgraded to URP Lit)
 Docs/                    TROUBLESHOOTING.md, CHANGES.md, AUDIT.md
 ```
-Architecture: no singletons — the scene builder wires references through serialized fields. `MissionController` owns state/objectives/score;
+Architecture: a data-driven shared framework. Each stage is a `MissionDefinition` asset (objectives, time, score weights) listed in `StageCatalog`; `MissionController` runs any of them; `CampaignProgress` (backed by `ICampaignStore`: PlayerPrefs, or in-memory for tests) owns unlocks, scores and stars. Stage scenes are generated by `SceneBuilder` (partials `.Campaign/.Earthquake/.Flood`) with one rig, one EventSystem and one mission per scene. No singletons — the scene builder wires references through serialized fields. `MissionController` owns state/objectives/score;
 `Hazard` subclasses (`FireHazard`, `GasLeakHazard`, `ElectricalHazard`) raise `Neutralized`; `PassageMonitor` polls debris; `Survivor` is a small state machine;
 `ScoreCalculator`/`ObjectiveTracker` are pure C# (unit-tested). VFX and audio are procedural (no extra audio/texture assets were added).
 
 ## Tests
-Unity Test Runner (Window ▸ General ▸ Test Runner): **EditMode** (score maths, objectives, vitals, settings, mission data, build settings, Android config) and
-**PlayMode** (mission flow with synthetic objects, hazards, passage clearing, loading the real scenes, full programmatic run). Results are recorded in `Docs/AUDIT.md`.
+Menu **Rescue Sim ▸ Tests** (or Window ▸ General ▸ Test Runner); results are written to `Builds/TestSummary.txt`.
+- **EditMode — 57 passing**: scoring, objectives, vitals, settings, mission data, campaign progress/unlocks/stars, stage catalog, Android config.
+- **PlayMode — 23 passing**: all three scenes load clean (one rig/EventSystem/mission, no missing scripts, 3–6 objectives); menu lock behaviour; XRI-select-driven playthroughs of stage 1 → 2 → 3 with results, unlocks and campaign-complete; retry and return to menu.
+- Tip: do a Play/Stop warm-up after launching the editor before running PlayMode tests (the first run after launch crashed the editor here), and run the groups (Playthroughs / Scenes and menu / Mission flow) separately.
 
 ## Building for Quest
-See `Docs/TROUBLESHOOTING.md` and `Docs/AUDIT.md` (Android section). Menu: **Rescue Sim ▸ Configure XR and Android** (idempotent), switch platform to Android in Build Profiles, then **Rescue Sim ▸ Build ▸ Android APK (Quest)**. Output goes to `Builds/Android/` with a report in `Builds/android-build-report.txt`.
+See `Docs/TROUBLESHOOTING.md` and `Docs/AUDIT.md` (Android section). Menu: **Rescue Sim ▸ Configure XR and Android** (idempotent), switch platform to Android in Build Profiles, then **Rescue Sim ▸ Build ▸ Android APK (Quest)**. Output goes to `Builds/Android/DisasterResponseVR.apk` with a report in `Builds/android-build-report.txt`.

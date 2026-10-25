@@ -433,6 +433,7 @@ namespace RescueSim.EditorTools
             UIFactory.AddBackground(briefing.transform, UIFactory.Panel);
             var bStage = UIFactory.AddText(briefing.transform, "", 30f, new Vector2(0, -26), new Vector2(1000, 40), TextAlignmentOptions.Center, UIFactory.TextDim, FontStyles.Bold);
             var bTitle = UIFactory.AddText(briefing.transform, "", 54f, new Vector2(0, -66), new Vector2(1020, 80), TextAlignmentOptions.Center, UIFactory.Accent, FontStyles.Bold);
+            bTitle.enableAutoSizing = true; bTitle.fontSizeMin = 30f; bTitle.fontSizeMax = 54f; bTitle.textWrappingMode = TextWrappingModes.NoWrap;
             var bBody = UIFactory.AddText(briefing.transform, "", 30f, new Vector2(0, -160), new Vector2(980, 540), TextAlignmentOptions.TopLeft, UIFactory.TextMain);
             UIFactory.AddText(briefing.transform, "TRIGGER presses buttons   -   GRIP grabs and assists   -   Left wrist shows the checklist", 24f, new Vector2(0, -700), new Vector2(1000, 40), TextAlignmentOptions.Center, UIFactory.TextDim);
             var begin = UIFactory.AddButton(briefing.transform, "Begin Mission", new Vector2(0, -770), new Vector2(560, 100), null, UIFactory.AccentDim, 42f);

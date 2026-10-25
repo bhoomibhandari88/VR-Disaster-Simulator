@@ -35,6 +35,8 @@ Material:
     RenderType: Transparent
   disabledShaderPasses:
   - SHADOWCASTER
+  - DepthOnly
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -44,7 +46,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 990f67670c679446f9f6712803e115da, type: 2}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
@@ -57,7 +59,7 @@ Material:
     - _Cull: 2
     - _Cutoff: 0.5
     - _DstBlend: 10
-    - _DstBlendAlpha: 0
+    - _DstBlendAlpha: 10
     - _QueueOffset: 0
     - _SampleGI: 0
     - _SrcBlend: 5
@@ -67,6 +69,6 @@ Material:
     - _ZWrite: 0
     m_Colors:
     - _BaseColor: {r: 1, g: 0.85, b: 0.15, a: 0.95}
-    - _Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    - _Color: {r: 1, g: 0.85, b: 0.14999998, a: 0.95}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

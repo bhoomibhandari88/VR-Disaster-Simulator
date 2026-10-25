@@ -1,61 +1,58 @@
 # Final audit — what is real, what is tested, what is not
 
-Date: 2026-10-24/25 · Unity 6000.3.21f1 · macOS (Apple Silicon M3) · Meta XR Simulator · branch `feature/factory-rescue-vr` (local commits only, **nothing pushed**).
+Date: 2026-10-25 · Unity 6000.3.21f1 · macOS (Apple Silicon M3) · Meta XR Simulator · branch `feature/factory-rescue-vr` (local commits only, **nothing pushed**).
 
-Legend — **Implemented**: code/assets exist. **Auto-tested**: covered by Unity Test Runner (EditMode/PlayMode) with real results. **Simulator-tested**: exercised by hand in Meta XR Simulator. **Headset-verified**: run on a physical Quest — **none of this project has been headset-verified.**
+Legend — **Implemented**: code/assets exist. **Auto-tested**: Unity Test Runner (EditMode/PlayMode) with real results. **Simulator-tested**: exercised by hand in Meta XR Simulator. **Headset-verified**: run on a physical Quest — **nothing in this project has been headset-verified.**
 
 ## 1. Verified facts (with how)
 | Claim | Evidence |
 |---|---|
-| Project compiles (macOS + Android targets), 0 console errors | Unity console after compile on both targets; EditMode/PlayMode assemblies compile |
-| EditMode tests: **39 / 39 passed** | Unity Test Runner, EditMode tab (re-run after final macOS switch: 39/39) |
-| PlayMode tests: **13 / 13 passed** (after fixing 6 test-harness failures and 1 real bug, below) | Unity Test Runner, PlayMode tab (re-run after final macOS switch: 13/13) |
-| Android build **succeeded**: 0 errors, 356 warnings, 1 h 03 min, `FactoryRescueVR.apk` ≈ 231 MB (IL2CPP, ARM64, Vulkan, min SDK 29) | `Builds/android-build-report.txt` written by `AndroidBuild.BuildApk()` from `BuildReport` |
-| Meta XR Simulator provides HMD + both controllers, tracked | `[XRProbe] HMD present=True tracked=True pos=(0,1.70,0) left=True right=True` |
-| Controller buttons reach Unity | `[XRProbe] LeftHand/RightHand triggerPressed PRESSED/released` |
-| VR UI ray hover + click works | `[XRProbe] Right Controller/Near-Far Interactor UI hit: Button_Begin Mission`, then trigger → briefing closed, mission started ("Mission started…" toast) |
+| EditMode tests: **57 / 57 passed** | Unity Test Runner via `Rescue Sim ▸ Tests`, `Builds/TestSummary.txt` |
+| PlayMode tests: **23 / 23 passed** (run in batches of 4 + 10 + 9) | same |
+| All three stage scenes load with one rig, one EventSystem, one mission, no missing scripts, 3–6 objectives | `CampaignSceneTests` |
+| Full playthroughs of Factory → Earthquake → Flood reach results, record score/stars, unlock the next stage; campaign-complete after stage 3; Retry and Menu work | `CampaignPlaythroughTests` (drives real `XRInteractionManager` select/deselect on survivors, pickups, valves, zones — **not** a headset and not manual simulator play) |
+| Meta XR Simulator provides HMD + controllers; VR ray-click on UI works (from the earlier milestone) | `[XRProbe]` console logs |
+| Manual simulator session: menu → stage load and briefing panel observed | screenshots; button clicking by keyboard aiming was too imprecise to complete a stage by hand |
+| Android build | see section 5 |
 
 ## 2. Feature matrix
-| Feature | Implemented | Auto-tested | Simulator-tested | Headset |
+| Feature | Implemented | Auto-tested | Simulator-tested (manual) | Headset |
 |---|---|---|---|---|
-| OpenXR + Meta Quest config (Editor/Android) | ✔ | ✔ (Android settings test) | ✔ (runtime launches) | ✘ |
-| XR rig (XRI Starter Assets), locomotion, comfort settings | ✔ | ✔ (single rig/camera/EventSystem) | ✔ (rig tracks; locomotion not exercised) | ✘ |
-| Main menu scene (start/settings/quit) | ✔ | ✔ (loads clean, no missing scripts) | ✘ | ✘ |
-| Briefing panel + Begin Mission | ✔ | ✔ | ✔ | ✘ |
-| Hazard rendering: fires, gas cloud, ambient/emergency lighting | ✔ | — | ✔ (visual check; scene is dark) | ✘ |
-| Power isolation (breaker) | ✔ | ✔ (logic: Cut idempotent, event) | ✘ | ✘ |
-| Gas valve mitigation | ✔ | ✔ (via programmatic full run in real scene) | ✘ | ✘ |
-| Extinguisher + fire intensity/regrowth + live-electric mistake | ✔ | ✔ (spray/regrow/extinguish logic) | ✘ | ✘ |
-| Debris carry-out / passage clearing | ✔ | ✔ (PassageMonitor logic) | ✘ | ✘ |
-| Survivor locate / follow / evacuate / lost | ✔ | ✔ (states via `ForceState`, real scene) | ✘ | ✘ |
-| Mission progression, failure (time, overcome), pause/resume | ✔ | ✔ | ✘ (pause UI) | ✘ |
-| Scoring + rank + results data | ✔ | ✔ (11 score tests + full run ≥ 800) | ✘ (results panel visual) | ✘ |
-| Results panel with Replay / Main Menu | ✔ | partly (scene reload test) | ✘ | ✘ |
-| Diegetic wrist HUD | ✔ | — | ✘ | ✘ |
-| Settings (snap/smooth turn, speed, vignette, volume) | ✔ | ✔ (GameSettings) | ✘ | ✘ |
-| Procedural spatial audio, VFX | ✔ | — | ✘ (audio not audited) | ✘ |
+| Main menu: stage cards, locks, progress, controls, settings, demo unlock-all | ✔ | ✔ (locks, unlock-all, load) | partial (menu → stage load) | ✘ |
+| Persistent unlocks/scores/stars (PlayerPrefs) | ✔ | ✔ (in-memory store) | ✘ | ✘ |
+| Briefing, HUD, results (score /100, stars, Next/Retry/Menu), campaign-complete | ✔ | ✔ (via playthroughs) | partial (briefing) | ✘ |
+| Stage 1 Factory (power, gas, fire, debris, 3 survivors) | ✔ | ✔ | ✘ | ✘ |
+| Stage 2 Earthquake | ✔ | ✔ | ✘ | ✘ |
+| Stage 3 Flood (rising water visual, supplies, evacuation) | ✔ | ✔ | ✘ | ✘ |
+| Survivor assess → follow → evacuate | ✔ | ✔ | ✘ | ✘ |
+| Teleport/snap-turn locomotion, comfort vignette, waypoint | ✔ | partly | ✘ | ✘ |
+| Procedural audio/VFX | ✔ | — | ✘ | ✘ |
 
-"Auto-tested" logic tests call the real runtime classes, but they do **not** prove the physical VR interactions (grabbing, gripping, spraying) feel or work correctly — those were not exercised in the simulator.
+"Auto-tested" playthroughs call the real runtime and XRI selection API but **do not prove** that grabbing, aiming and locomotion feel right with real controllers.
 
-## 3. Bugs found and fixed during verification
-1. `No MissionDefinition assigned` after scene rebuild (asset reference lost) → builder reloads the asset after scene operations.
-2. Filled UI images ignored `fillAmount` (null sprite) → shared white sprite.
-3. `PassageMonitor` threw `NullReferenceException` when created in code without a hide-list (found by PlayMode test) → null-guarded.
-4. Builder created duplicate empty `Materials N` / `Prefabs N` folders → `EnsureDir` now imports an existing folder instead of recreating it; duplicates removed.
-5. Pack materials rendered pink (Built-in shader in URP) → converted to URP Lit.
-6. "UI dead" investigation: not a bug — the ray was passing over non-clickable panel area; diagnostics (`XRInputProbe`) kept for future troubleshooting.
+## 3. Bugs found and fixed this milestone
+1. Stages 2/3 started with a null `MissionDefinition`: `NewScene(Single)` unloaded the asset → builder reloads it after creating the scene (found by tests).
+2. Briefing panel at floor/ceiling height because head tracking reads (0,0,0) for the first frames → `VRPanel` waits for tracking, falls back to rig height + 1.6 m.
+3. Hazard-free stages scored 0 on the hazard share → now awarded on completion (test updated deliberately).
+4. Retry test raced two scene loads (test bug) → fixed.
+5. Earlier milestone fixes: see git history.
 
 ## 4. Known issues / risks
-- **Never run on a headset.** Frame rate, thermals, comfort and real controller ergonomics are unknown. The APK is installable but unverified.
-- APK ≈ 231 MB and a 63-minute first build: the pack textures are large and the project already contains Unity AI Inference (Sentis) and Unity AI Assistant packages (not added by this work) which add ~1,300 shader variants/compile time. Removing unused packages is a user decision; texture compression/atlasing would reduce size.
-- Scene is dark; reflection probes/lightmaps come from the pack. Emergency/fire lights give local light only. Needs visual tuning on a headset.
-- Briefing "Begin Mission" is at the bottom of a tall panel; with a near-horizontal controller ray it can be hard to hit in the desktop simulator (stepping back or pitching resolves it). Consider moving it higher/lower the panel on a real device.
-- Project Validation (Quest tab) shows 4 optional warnings (OpenXR PoseControl/StickControl hints, Composition Layers package, SSAO on the desktop PC quality tier). Android uses the Mobile URP asset (no SSAO; MSAA 4×, HDR off).
-- Platform switches rewrite some pack `.meta` files and a few settings assets (Unity re-serialization, plus `UnityConnectSettings` diagnostics flag). These incidental changes were deliberately **not committed**.
-- LFS-type binaries from the XRI sample (png/fbx/wav) and `TextMesh Pro/Sprites/EmojiOne.png` are untracked — the authoring VM has no Git LFS. Add them from a machine with Git LFS before pushing, otherwise the scene's rig/UI may reference missing sprites/models on a fresh clone.
-- `Assets/Resources/PerformanceTest*.json` are generated transiently by the performance-testing package during builds; they are not committed.
+- **Never run on a headset.** Frame rate, thermals, comfort, controller ergonomics are unknown. Light counts are modest and no post-processing is used, but this was not profiled.
+- Unity (editor) crashed several times during PlayMode runs, mostly the first run after launch; workaround in README. Cause not investigated.
+- An `XRI BaseAsyncAffordanceStateReceiver.HandleTween` NullReferenceException flood appeared in the console after a manual simulator session; not investigated or reproduced in tests. May be a pre-existing XRI sample issue.
+- Manual simulator aiming with the keyboard profile is laggy and imprecise; Quest controllers should be easier.
+- Platform switches rewrite some pack `.meta` files and settings assets; these incidental changes are deliberately not committed.
+- LFS binaries from the XRI sample and TextMesh Pro `EmojiOne.png` are untracked (authoring VM has no Git LFS). Add them from a machine with Git LFS before pushing, otherwise a fresh clone may miss some sprites/models.
+- APK size and first-build time are large (previous build ≈ 231 MB, ≈ 1 h) because of pack textures and extra packages already in the project.
 
-## 5. Recommended next steps (needs you)
-1. Install the APK on a Quest (developer mode, `adb install -r Builds/Android/FactoryRescueVR.apk`) and play through once; log fps with OVR Metrics.
-2. Run the full loop in the simulator or headset: breaker → valve → extinguish → debris → survivors → exit → results → replay; adjust tuning (fire time 4 s, regrowth 3 %/s, exposure rates).
-3. Add LFS binaries and review `git status`, then approve a push to `feature/factory-rescue-vr` (remote is `bhoomibhandari88/VR-Disaster-Simulator`; no push was made).
+## 5. Android build
+- Active target Android, IL2CPP, ARM64, Vulkan, min SDK 29, OpenXR with Meta Quest support + Touch profiles enabled, 4 scenes (MainMenu, FactoryRescue, EarthquakeRescue, FloodEvacuation).
+- Result **Succeeded**, 354 warnings on the full build. APK: `Builds/Android/DisasterResponseVR.apk`, 242,528,206 bytes (≈ 231 MiB), 816 entries, SHA-256 `7775384dbee3a500e735f2079d1917684dbcad52b6a6dde542f360aac781efe1`. The report's "Size: 1604 MB" is Unity's total build-output size (incl. symbols), not the APK. The report timestamp is local time mislabelled `Z`.
+- Inspected the APK manifest: package `com.rescuesim.*`, Oculus supported devices (quest/quest2/quest3s), head-tracking and `android.hardware.vr` entries; `libopenxr_loader.so`, `libunity.so`, `libil2cpp.so` (arm64-v8a) present. It is debug-signed (no keystore). **Never installed or run on a device.**
+- Build-time console error (non-blocking, 1 per build): `NullReferenceException` inside the OpenXR package's own Project Validation rule (`MetaQuestFeature.CreateValidationRules`, MetaQuestFeature.cs:539 via MockRuntime). Build result is still Succeeded and the APK is produced; not caused by project code. A first rebuild during the audit had shown the Quest OpenXR features disabled in `OpenXR Package Settings.asset` (a side effect of earlier platform switching); re-running *Rescue Sim ▸ Configure XR and Android* restored them and the APK was rebuilt afterwards.
+
+## 6. Recommended next steps (needs you)
+1. Install the APK on a Quest (`adb install -r Builds/Android/DisasterResponseVR.apk`), play all three stages, and log fps with OVR Metrics.
+2. Tune timings/score weights in the three `Mission_*.asset` files after headset play.
+3. Add LFS binaries, review `git status`, then approve a push (origin: `queenjj11/VR-Disaster-Simulator`). No push has been made.

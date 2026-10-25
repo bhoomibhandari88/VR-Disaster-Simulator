@@ -23,11 +23,16 @@ namespace RescueSim.EditorTools
 
         [MenuItem("Rescue Sim/Tests/Run EditMode")] static void Edit() => Run(TestMode.EditMode);
         [MenuItem("Rescue Sim/Tests/Run PlayMode")] static void Play() => Run(TestMode.PlayMode);
+        [MenuItem("Rescue Sim/Tests/Run PlayMode - Playthroughs")] static void PlayThrough() => Run(TestMode.PlayMode, @"RescueSim\.Tests\.CampaignPlaythroughTests");
+        [MenuItem("Rescue Sim/Tests/Run PlayMode - Scenes and menu")] static void PlayScenes() => Run(TestMode.PlayMode, @"RescueSim\.Tests\.(CampaignSceneTests|SceneSmokeTests)");
+        [MenuItem("Rescue Sim/Tests/Run PlayMode - Mission flow")] static void PlayFlow() => Run(TestMode.PlayMode, @"RescueSim\.Tests\.MissionFlowTests");
 
-        static void Run(TestMode mode)
+        static void Run(TestMode mode, string groupRegex = null)
         {
             File.Delete(SummaryPath());
-            _api.Execute(new ExecutionSettings(new Filter { testMode = mode }));
+            var f = new Filter { testMode = mode };
+            if (!string.IsNullOrEmpty(groupRegex)) f.groupNames = new[] { groupRegex };
+            _api.Execute(new ExecutionSettings(f));
         }
 
         static string SummaryPath()
@@ -40,10 +45,12 @@ namespace RescueSim.EditorTools
         class Cb : ICallbacks
         {
             static readonly StringBuilder Fails = new StringBuilder();
-            public void RunStarted(ITestAdaptor t) { Fails.Clear(); }
-            public void TestStarted(ITestAdaptor t) { }
+            static void Log(string line) => File.AppendAllText(Path.Combine(Path.GetDirectoryName(SummaryPath()), "TestProgress.txt"), line + "\n");
+            public void RunStarted(ITestAdaptor t) { Fails.Clear(); File.WriteAllText(Path.Combine(Path.GetDirectoryName(SummaryPath()), "TestProgress.txt"), ""); }
+            public void TestStarted(ITestAdaptor t) { if (!t.HasChildren) Log("START " + t.FullName); }
             public void TestFinished(ITestResultAdaptor r)
             {
+                if (!r.HasChildren) Log($"{r.TestStatus} {r.FullName} ({r.Duration:F1}s)");
                 if (!r.HasChildren && r.TestStatus == TestStatus.Failed) Fails.AppendLine($"FAIL {r.FullName}: {r.Message}");
             }
             public void RunFinished(ITestResultAdaptor r)

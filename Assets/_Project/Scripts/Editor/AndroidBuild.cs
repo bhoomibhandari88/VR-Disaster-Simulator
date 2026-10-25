@@ -17,10 +17,17 @@ namespace RescueSim.EditorTools
         const string OutDir = "Builds/Android";
         const string ReportPath = "Builds/android-build-report.txt";
 
+        [MenuItem("Rescue Sim/Build/Switch target to Android")]
+        static void ToAndroid() => EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Android, BuildTarget.Android);
+
+        [MenuItem("Rescue Sim/Build/Switch target to macOS")]
+        static void ToMac() => EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Standalone, BuildTarget.StandaloneOSX);
+
         [MenuItem("Rescue Sim/Build/Android APK (Quest) - requires Android active target")]
         public static void BuildApk()
         {
             Directory.CreateDirectory(OutDir);
+            PlayerSettings.productName = ProjectInfo.ProductName;
             var sb = new StringBuilder();
             sb.AppendLine($"Android build report - {DateTime.Now:u}");
             sb.AppendLine($"Unity {Application.unityVersion}");
@@ -38,7 +45,7 @@ namespace RescueSim.EditorTools
             var opts = new BuildPlayerOptions
             {
                 scenes = scenes,
-                locationPathName = Path.Combine(OutDir, "FactoryRescueVR.apk"),
+                locationPathName = Path.Combine(OutDir, "DisasterResponseVR.apk"),
                 target = BuildTarget.Android,
                 targetGroup = BuildTargetGroup.Android,
                 options = BuildOptions.None
