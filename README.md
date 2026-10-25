@@ -57,13 +57,22 @@ Tips: aim the ray at a button by turning/pitching with the arrows (≈70°/s) or
 - **Each stage**: briefing panel → *Begin Mission* → consistent HUD (timer, objective checklist) → results screen with score /100, 1–3 stars and **Next / Retry / Menu**. Finishing stage 3 shows a campaign-complete screen.
 - **Stars** (`StageScoring`): ≥85 → 3, ≥60 → 2, otherwise 1; 0 if not completed. Completing stage N unlocks stage N+1.
 
+## START triage study (IVRAR capstone)
+A stand-alone scene, **Triage Study** on the main menu (`Assets/_Project/Scenes/TriageSimulation.unity`), is a ten-casualty mass-casualty exercise in a burning factory yard. It is separate from the three campaign stages.
+
+- **Flow:** Begin Exercise -> approach a casualty, point and press the trigger to select it -> run the six START checks (walking, breathing, airway, respiratory rate, perfusion, mental status) -> tag Green / Yellow / Red / Black (final) -> results panel -> Restart or Main Menu.
+- **Protocol:** START adult with capillary refill > 2 s (default) or radial pulse, chosen explicitly and written to every CSV row. A training exercise, **not clinically validated**. Details and sources: `Docs/TECHNICAL_IMPLEMENTATION_REPORT.md`.
+- **Editor keys:** Enter begin, Tab next casualty, 1-6 checks, 7/8/9/0 (or F1-F4) tag Green/Yellow/Red/Black, F5 restart.
+- **Telemetry:** three CSV files per session in `persistentDataPath/TriageTelemetry/` (`*_records.csv` raw, `*_summary.csv` derived, `*_confusion.csv`). Participant IDs are anonymous (`P01`...), each row carries a provenance label (`SoftwareTest`, `Pilot`, `HumanParticipant`). Columns and equations: technical report. Blank templates and the human-study plan: `Docs/STUDY_PROTOCOL.md`, `Docs/templates/`.
+- **Status:** editor-tested only. No physical headset testing has been done. No human-study data exists.
+
 ## Project layout
 ```
 Assets/_Project/
-  Scripts/Runtime/{Core,Hazards,Interaction,Survivors,UI,Audio,Player,World}   # gameplay (assembly RescueSim.Runtime)
+  Scripts/Runtime/{Core,Hazards,Interaction,Survivors,UI,Audio,Player,World,Triage}   # gameplay (assembly RescueSim.Runtime)
   Scripts/Editor/                                                       # scene/prefab builder, XR+Android setup, Android build
   Data/            one MissionDefinition ScriptableObject per stage
-  Scenes/          MainMenu, FactoryRescue, EarthquakeRescue, FloodEvacuation (+ baked NavMeshes)
+  Scenes/          MainMenu, FactoryRescue, EarthquakeRescue, FloodEvacuation, TriageSimulation (+ baked NavMeshes)
   Prefabs/ Materials/ Shaders/                                           # generated + authored
   Tests/{EditMode,PlayMode}                                              # NUnit/Unity Test Framework suites
 Assets/TirgamesAssets/   original factory pack (materials upgraded to URP Lit)
@@ -75,8 +84,8 @@ Architecture: a data-driven shared framework. Each stage is a `MissionDefinition
 
 ## Tests
 Menu **Rescue Sim ▸ Tests** (or Window ▸ General ▸ Test Runner); results are written to `Builds/TestSummary.txt`.
-- **EditMode — 57 passing**: scoring, objectives, vitals, settings, mission data, campaign progress/unlocks/stars, stage catalog, Android config.
-- **PlayMode — 23 passing**: all three scenes load clean (one rig/EventSystem/mission, no missing scripts, 3–6 objectives); menu lock behaviour; XRI-select-driven playthroughs of stage 1 → 2 → 3 with results, unlocks and campaign-complete; retry and return to menu.
+- **EditMode — 107 passing**: scoring, objectives, vitals, settings, mission data, campaign progress/unlocks/stars, stage catalog, Android config, plus 50 triage cases (START branches and boundaries, session, metrics, CSV, export, scenario).
+- **PlayMode — 29 passing** (23 campaign + 6 triage scene tests): all three scenes load clean (one rig/EventSystem/mission, no missing scripts, 3–6 objectives); menu lock behaviour; XRI-select-driven playthroughs of stage 1 → 2 → 3 with results, unlocks and campaign-complete; retry and return to menu.
 - Tip: do a Play/Stop warm-up after launching the editor before running PlayMode tests (the first run after launch crashed the editor here), and run the groups (Playthroughs / Scenes and menu / Mission flow) separately.
 
 ## Building for Quest
