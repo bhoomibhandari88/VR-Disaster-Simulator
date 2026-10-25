@@ -72,7 +72,7 @@ Copy participant files into `telemetry/P01.csv`... as the dossier asks, or keep 
 ## 7. Known limitations that must appear in the write-up
 
 - START protocol variant and thresholds come from published START descriptions (see `TECHNICAL_IMPLEMENTATION_REPORT.md`). The exercise is a training aid, not a clinically validated triage tool, and was not reviewed by a clinician.
-- The scenario has only ten fixed casualties, so memorisation across repeat sessions is possible and findings are specific to this set. The on-screen observation text gives hints (for example "limping but walking").
+- The scenario has only ten fixed casualties, so memorisation across repeat sessions is possible and findings are specific to this set.
 - Hazard escalation is cosmetic (smoke, lighting) and does not change a casualty's findings, so "dynamic hazard conditions" is represented only as time-varying atmosphere and elapsed-time display.
 - Single device type (Meta Quest), small sample, no control arm, self-selected volunteers.
 - The headset build has not been installed or run on a physical device by the author of this document.

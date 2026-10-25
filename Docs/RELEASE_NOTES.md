@@ -2,11 +2,13 @@
 
 **Asset:** `DisasterResponseVR.apk`, 242,633,136 bytes (231.4 MiB), SHA-256 `eaa125abb997b220653f94c382ad78136708748555e57c69b1f8c13d94107c8c`. Debug-signed, IL2CPP ARM64, Vulkan, min SDK 29, Meta Quest OpenXR feature enabled, 5 scenes. Built 2026-10-25 with Unity 6000.3.21f1 (build duration 22 min). The APK is not committed to Git; it is attached to the release only.
 
+**APK STALE WARNING:** the APK hashed above was built from commit b2b6d84, BEFORE the fix in f054410 (selection text no longer reveals findings; protocol label in UI). Rebuild and re-hash the APK, and update the size/SHA-256 here, before publishing a release.
+
 **What it is:** a three-stage VR disaster-rescue game (Factory, Earthquake, Flood) with main menu, progression, scoring and stars, **plus** a stand-alone START mass-casualty triage exercise (**Triage Study** button on the main menu): ten casualties in a burning factory yard, six START checks per casualty, Green/Yellow/Red/Black tags, results panel, CSV telemetry (records, summary, confusion matrix). START is implemented from published descriptions and is a training aid, **not clinically validated**.
 
 **Install (Quest 3/3S, developer mode):** `adb install -r DisasterResponseVR.apk`; launch from Unknown Sources.
 
-**Verification (macOS editor, 2026-10-25):** EditMode 107/107 and PlayMode 29/29 pass (57 + 23 campaign tests unchanged, plus 50 EditMode cases and 6 PlayMode tests for the triage exercise). Playthroughs are driven by XR Interaction Toolkit events and the real UI buttons, not by a headset.
+**Verification (macOS editor, 2026-10-25):** EditMode 109/109 and PlayMode 31/31 pass (57 + 23 campaign tests unchanged, plus 52 EditMode cases and 8 PlayMode tests for the triage exercise). Playthroughs are driven by XR Interaction Toolkit events and the real UI buttons, not by a headset.
 
 **APK check:** Android build reported Succeeded (1 non-blocking error, 354 warnings). The package contains the 5 scenes (`level0`-`level4`) and the Quest manifest entries (`com.oculus.supportedDevices`, `android.hardware.vr.headtracking`).
 

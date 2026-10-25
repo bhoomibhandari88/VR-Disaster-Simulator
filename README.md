@@ -84,8 +84,8 @@ Architecture: a data-driven shared framework. Each stage is a `MissionDefinition
 
 ## Tests
 Menu **Rescue Sim ▸ Tests** (or Window ▸ General ▸ Test Runner); results are written to `Builds/TestSummary.txt`.
-- **EditMode — 107 passing**: scoring, objectives, vitals, settings, mission data, campaign progress/unlocks/stars, stage catalog, Android config, plus 50 triage cases (START branches and boundaries, session, metrics, CSV, export, scenario).
-- **PlayMode — 29 passing** (23 campaign + 6 triage scene tests): all three scenes load clean (one rig/EventSystem/mission, no missing scripts, 3–6 objectives); menu lock behaviour; XRI-select-driven playthroughs of stage 1 → 2 → 3 with results, unlocks and campaign-complete; retry and return to menu.
+- **EditMode — 109 passing**: scoring, objectives, vitals, settings, mission data, campaign progress/unlocks/stars, stage catalog, Android config, plus 52 triage cases (START branches and boundaries, session, metrics, CSV, export, scenario).
+- **PlayMode — 31 passing** (23 campaign + 8 triage scene tests): all three scenes load clean (one rig/EventSystem/mission, no missing scripts, 3–6 objectives); menu lock behaviour; XRI-select-driven playthroughs of stage 1 → 2 → 3 with results, unlocks and campaign-complete; retry and return to menu.
 - Tip: do a Play/Stop warm-up after launching the editor before running PlayMode tests (the first run after launch crashed the editor here), and run the groups (Playthroughs / Scenes and menu / Mission flow) separately.
 
 ## Building for Quest

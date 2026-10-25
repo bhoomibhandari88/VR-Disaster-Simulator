@@ -8,7 +8,7 @@ Legend: DONE = evidence exists in the repository. PARTIAL = built but needs your
 |---|---|---|
 | Triage scene with 10 casualties, START workflow, 4 tags | DONE (editor-tested) | `TriageSimulation.unity`, `TriageSceneTests` pass |
 | `STARTTriageSimulationManager.cs`, `TriageTelemetryLogger.cs`, CSV export | DONE | `Scripts/Runtime/Triage/` |
-| Unit and scene tests | DONE | EditMode 107/107, PlayMode 29/29 |
+| Unit and scene tests | DONE | EditMode 109/109, PlayMode 31/31 |
 | Android APK built with the triage scene | See `RELEASE_NOTES.md` | build report |
 | Run on a Quest / Meta XR Simulator | **PENDING** | nobody has played it in a headset |
 | Review code, decide authorship statements | **PENDING** | all commits are authored "Claude"; per-member work cannot be derived from git |

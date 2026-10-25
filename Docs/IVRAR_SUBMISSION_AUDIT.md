@@ -8,13 +8,13 @@ The repository now contains both the three-stage rescue game and a **START mass-
 ## 2. Verified facts
 | Fact | Evidence |
 |---|---|
-| Triage code commit `b2b6d840b91295417c489ef9457336f761ac4d6f` on `feature/factory-rescue-vr` (parent `ade9e21`); docs commit follows it. Neither is pushed | `git log` |
+| Triage code commits `b2b6d84` and `f054410` (fix: findings no longer revealed on selection; protocol labelled in UI) on `feature/factory-rescue-vr` (parent `ade9e21`); docs commit follows it. Neither is pushed | `git log` |
 | 249 files tracked by Git LFS, `git lfs fsck` OK; the triage commit added no binaries | `git lfs ls-files` |
 | No APK, Library, Temp or Builds in any commit | `git log --all --name-only` finds 0 `.apk`; `.gitignore` covers `Builds/`, `Library/` |
-| EditMode 107/107 pass (57 existing + 50 new triage cases); PlayMode 29/29 pass (23 existing + 6 new) | Unity Test Runner, `Builds/TestSummary.txt` |
+| EditMode 109/109 pass (57 existing + 52 triage cases); PlayMode 31/31 pass (23 existing + 8 triage) | Unity Test Runner, `Builds/TestSummary.txt` |
 | Triage scene builds from `Rescue Sim > Build > Triage Scene`; editor capture views reviewed; no console errors after compile | `Builds/Shots/TriageSimulation_*.png` (not committed) |
 | Android build Succeeded (22 min), 1 non-blocking OpenXR validation `NullReferenceException`, 354 warnings, 5 scenes | `Builds/android-build-report.txt` |
-| APK `Builds/Android/DisasterResponseVR.apk`: 242,633,136 bytes (231.4 MiB), SHA-256 `eaa125abb997b220653f94c382ad78136708748555e57c69b1f8c13d94107c8c`, IL2CPP ARM64, Quest manifest entries, `level0`-`level4` | build report, `unzip -l`, manifest strings |
+| **STALE (built before f054410; rebuild before release)** APK `Builds/Android/DisasterResponseVR.apk`: 242,633,136 bytes (231.4 MiB), SHA-256 `eaa125abb997b220653f94c382ad78136708748555e57c69b1f8c13d94107c8c`, IL2CPP ARM64, Quest manifest entries, `level0`-`level4` | build report, `unzip -l`, manifest strings |
 | C# in `Assets/_Project`: 84 files, 10,012 lines | `find … | wc -l` |
 | Real participant telemetry files: **0** | no `telemetry/` folder |
 | APK **not** installed or run on any device | no headset, no `adb` |
