@@ -17,6 +17,7 @@ namespace RescueSim.Triage
         [Header("Start panel")]
         [SerializeField] Button beginButton, participantButton, provenanceButton;
         [SerializeField] TMP_Text participantLabel, provenanceLabel, startMessage;
+        [SerializeField] TMP_Text protocolText;
         [SerializeField] Toggle feedbackToggle;
         [Header("Assessment panel")]
         [SerializeField] TMP_Text headerText, descriptionText, feedbackText, progressText;
@@ -68,7 +69,21 @@ namespace RescueSim.Triage
             manager.CasualtyTagged -= OnTagged; manager.SessionCompleted -= OnCompleted; manager.Message -= OnMessage;
         }
 
-        void Start() { feedbackToggle?.SetIsOnWithoutNotify(manager != null && manager.ShowCorrectness); ShowStart(); }
+        void Start()
+        {
+            feedbackToggle?.SetIsOnWithoutNotify(manager != null && manager.ShowCorrectness);
+            if (manager != null)
+            {
+                for (int i = 0; i < examButtons.Length; i++)
+                {
+                    var t = examButtons[i] != null ? examButtons[i].GetComponentInChildren<TMP_Text>() : null;
+                    if (t != null) t.text = STARTEvaluator.Label((ExamKind)i, manager.Perfusion);
+                }
+                if (protocolText != null)
+                    protocolText.text = "Protocol: START adult, perfusion check = " + (manager.Perfusion == PerfusionCriterion.CapillaryRefill ? "capillary refill > 2 s" : "radial pulse") + ". Training exercise, not clinically validated.";
+            }
+            ShowStart();
+        }
 
         void Update()
         {
@@ -122,7 +137,7 @@ namespace RescueSim.Triage
         void OnSelected(CasualtyProfile c)
         {
             if (headerText != null) headerText.text = "Assessing " + c.Id;
-            if (descriptionText != null) descriptionText.text = c.Vitals.observation;
+            if (descriptionText != null) descriptionText.text = "Run the START checks below, then assign a tag. Findings appear only after you check them.";
             ClearExamTexts();
             var s = manager.Session;
             for (int i = 0; i < examResults.Length; i++)

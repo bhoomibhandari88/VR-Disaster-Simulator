@@ -230,9 +230,9 @@ namespace RescueSim.EditorTools
             UIFactory.AddText(sc.transform, "INDUSTRIAL MASS-CASUALTY TRIAGE", 58f, new Vector2(0, -24), new Vector2(1120, 80), TextAlignmentOptions.Center, UIFactory.Accent, FontStyles.Bold);
             UIFactory.AddText(sc.transform,
                 "Ten casualties, one factory yard on fire. Walk to each casualty, point and press TRIGGER to select, run the START checks (walk, breathing, airway, respiratory rate, perfusion, commands), then assign RED, YELLOW, GREEN or BLACK.\n\n" +
-                "Tags are final. Your time per casualty and every decision is logged for the study.\n\n" +
-                "Protocol: START adult (simple triage and rapid treatment) with capillary refill; a training exercise, not a clinically validated tool.",
-                30f, new Vector2(0, -120), new Vector2(1080, 330), TextAlignmentOptions.TopLeft, UIFactory.TextMain);
+                "Tags are final. Your time per casualty and every decision is logged for the study.",
+                30f, new Vector2(0, -120), new Vector2(1080, 270), TextAlignmentOptions.TopLeft, UIFactory.TextMain);
+            var protocolText = UIFactory.AddText(sc.transform, "", 24f, new Vector2(0, -395), new Vector2(1080, 44), TextAlignmentOptions.Center, UIFactory.TextDim);
             var participantBtn = UIFactory.AddButton(sc.transform, "Participant", new Vector2(-300, -450), new Vector2(520, 80), null, UIFactory.Button, 30f);
             var participantLabel = UIFactory.AddText(sc.transform, "Participant: TEST", 28f, new Vector2(300, -470), new Vector2(520, 44), TextAlignmentOptions.Center, UIFactory.TextDim, FontStyles.Bold);
             var provenanceBtn = UIFactory.AddButton(sc.transform, "Data type", new Vector2(-300, -540), new Vector2(520, 80), null, UIFactory.Button, 30f);
@@ -281,7 +281,7 @@ namespace RescueSim.EditorTools
             Ref(ui, "startPanel", startPanel); Ref(ui, "assessPanel", assessPanel); Ref(ui, "resultsPanel", resultsPanel);
             Ref(ui, "beginButton", beginBtn); Ref(ui, "participantButton", participantBtn); Ref(ui, "provenanceButton", provenanceBtn);
             Ref(ui, "participantLabel", participantLabel); Ref(ui, "provenanceLabel", provenanceLabel); Ref(ui, "startMessage", startMessage);
-            Ref(ui, "feedbackToggle", feedbackToggle);
+            Ref(ui, "feedbackToggle", feedbackToggle); Ref(ui, "protocolText", protocolText);
             Ref(ui, "headerText", header); Ref(ui, "descriptionText", description); Ref(ui, "feedbackText", feedback); Ref(ui, "progressText", progress);
             Refs(ui, "examButtons", examButtons); Refs(ui, "examResults", examResults); Refs(ui, "tagButtons", tagButtons);
             Ref(ui, "summaryText", summary); Ref(ui, "pathText", pathText);

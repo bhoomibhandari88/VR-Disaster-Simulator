@@ -432,6 +432,29 @@ namespace RescueSim.Tests
             finally { if (Directory.Exists(dir)) Directory.Delete(dir, true); }
         }
 
+        [Test] public void Variants_AreRecordedSeparately_AndObserveDifferentInputs()
+        {
+            foreach (var (crit, label) in new[] { (Cap, "CapillaryRefill"), (Pulse, "RadialPulse") })
+            {
+                var clk = new Clock();
+                var s = new TriageSession(new[] { new CasualtyCase("A", V(refill: 3f, pulse: false)) }, crit, clk.Now, clk.Utc);
+                s.Start(); s.BeginAssessment("A"); s.Examine(ExamKind.Perfusion); clk.t += 2; var r = s.Assign(TriageCategory.Red);
+                var f = SplitCsvLine(TriageCsv.RecordsToCsv(s.Records).Split('\n')[1]);
+                Assert.AreEqual(label, f[3]);
+                Assert.AreEqual(crit == Cap ? "3" : "", f[23], "obs_cap_refill_s only for the refill variant");
+                Assert.AreEqual(crit == Pulse ? "false" : "", f[24], "obs_radial_pulse only for the pulse variant");
+                Assert.AreEqual(crit, r.protocol);
+                StringAssert.Contains(crit == Cap ? "refill" : "pulse", STARTEvaluator.Label(ExamKind.Perfusion, crit).ToLowerInvariant());
+            }
+        }
+
+        [Test] public void Examine_DoesNotLeakOtherFindings()
+        {
+            var clk = new Clock(); var s = Standard(clk); s.Start(); s.BeginAssessment("B");
+            var txt = s.Examine(ExamKind.Walking);
+            StringAssert.DoesNotContain("40", txt); StringAssert.DoesNotContain("breaths", txt);
+        }
+
         // ---- Scenario and campaign compatibility ------------------------------------------------------
 
         [Test] public void Scenario_HasTenUniqueCasualties_WithKnownMix()

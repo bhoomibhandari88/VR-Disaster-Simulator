@@ -139,6 +139,43 @@ namespace RescueSim.Tests
         }
 
         [UnityTest]
+        public IEnumerator Selecting_ARedCasualty_DoesNotRevealFindings()
+        {
+            STARTTriageSimulationManager m = null; TriageUI ui = null;
+            yield return LoadTriage((a, b) => { m = a; ui = b; });
+            m.BeginSession();
+            var c = m.Casualties[5];   // C06: respiratory rate 36, "breathing very fast" in the scenario data
+            Assert.IsTrue(m.SelectCasualty(c));
+            var texts = Object.FindObjectsByType<TMPro.TMP_Text>(FindObjectsInactive.Include, FindObjectsSortMode.None).Select(t => t.text).ToList();
+            Assert.IsFalse(texts.Any(t => t.Contains(c.Vitals.observation)), "scenario observation text must not be shown");
+            Assert.IsFalse(texts.Any(t => t.Contains("36")), "respiratory rate must not appear before the check");
+            m.Examine(ExamKind.RespiratoryRate);
+            texts = Object.FindObjectsByType<TMPro.TMP_Text>(FindObjectsInactive.Include, FindObjectsSortMode.None).Select(t => t.text).ToList();
+            Assert.IsTrue(texts.Any(t => t.Contains("36 breaths/min")), "shown after the check");
+        }
+
+        [UnityTest]
+        public IEnumerator HazardEscalation_StepsUp_WhileRunning_AndResets()
+        {
+            STARTTriageSimulationManager m = null; TriageUI ui = null;
+            yield return LoadTriage((a, b) => { m = a; ui = b; });
+            var hz = Object.FindFirstObjectByType<TriageHazardEscalation>();
+            typeof(TriageHazardEscalation).GetField("secondsPerLevel", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(hz, 1f);
+            var smoke = Object.FindObjectsByType<ParticleSystem>(FindObjectsSortMode.None).First(p => p.name == "Smoke");
+            float baseRate = smoke.emission.rateOverTimeMultiplier;
+            Assert.AreEqual(0, hz.Level);
+            m.BeginSession();
+            float t0 = Time.time;
+            while (Time.time - t0 < 2.4f) yield return null;
+            Assert.GreaterOrEqual(hz.Level, 2, "level rises with elapsed time");
+            Assert.Greater(smoke.emission.rateOverTimeMultiplier, baseRate, "smoke emission grows");
+            Assert.AreEqual(hz.Level, m.Session.Records.Count == 0 ? m.HazardLevel : -1);
+            m.Restart();
+            Assert.AreEqual(0, hz.Level);
+            Assert.AreEqual(baseRate, smoke.emission.rateOverTimeMultiplier, 1e-3f);
+        }
+
+        [UnityTest]
         public IEnumerator MainMenu_HasTriageButton_AndStillThreeStages()
         {
             yield return Load(StageCatalog.MenuScene);
