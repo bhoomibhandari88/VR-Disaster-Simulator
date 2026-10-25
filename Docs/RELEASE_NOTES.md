@@ -1,8 +1,8 @@
-# Disaster Response VR — group-16-v1.0 (Quest APK) — DRAFT, not yet published
+# Disaster Response VR — group-16-v1.0 (Quest APK) — DRAFT, NOT PUBLISHED (awaiting approval)
 
-**Asset:** `DisasterResponseVR.apk`, 242,633,136 bytes (231.4 MiB), SHA-256 `eaa125abb997b220653f94c382ad78136708748555e57c69b1f8c13d94107c8c`. Debug-signed, IL2CPP ARM64, Vulkan, min SDK 29, Meta Quest OpenXR feature enabled, 5 scenes. Built 2026-10-25 with Unity 6000.3.21f1 (build duration 22 min). The APK is not committed to Git; it is attached to the release only.
+**Asset:** `DisasterResponseVR.apk`, 242,635,956 bytes (231.4 MiB), SHA-256 `a533c6d08427da2d5268c421d9d6cb5ea64f807248abdce518c7476798ecd6f4`. Debug-signed, IL2CPP ARM64, Vulkan, min SDK 29, Meta Quest OpenXR feature enabled, 5 scenes. Built 2026-10-26 with Unity 6000.3.21f1 (1 min incremental build). The APK is not committed to Git; it is attached to the release only.
 
-**APK STALE WARNING:** the APK hashed above was built from commit b2b6d84, BEFORE the fix in f054410 (selection text no longer reveals findings; protocol label in UI). Rebuild and re-hash the APK, and update the size/SHA-256 here, before publishing a release.
+**APK status:** rebuilt on 2026-10-26 from the working tree at commit `5f7ac5e` (includes fix `f054410`); see `BUILD_REPORT.md`. Replaces the earlier APK `eaa125ab…`, which predated the fix.
 
 **What it is:** a three-stage VR disaster-rescue game (Factory, Earthquake, Flood) with main menu, progression, scoring and stars, **plus** a stand-alone START mass-casualty triage exercise (**Triage Study** button on the main menu): ten casualties in a burning factory yard, six START checks per casualty, Green/Yellow/Red/Black tags, results panel, CSV telemetry (records, summary, confusion matrix). START is implemented from published descriptions and is a training aid, **not clinically validated**.
 
@@ -10,7 +10,7 @@
 
 **Verification (macOS editor, 2026-10-25):** EditMode 109/109 and PlayMode 31/31 pass (57 + 23 campaign tests unchanged, plus 52 EditMode cases and 8 PlayMode tests for the triage exercise). Playthroughs are driven by XR Interaction Toolkit events and the real UI buttons, not by a headset.
 
-**APK check:** Android build reported Succeeded (1 non-blocking error, 354 warnings). The package contains the 5 scenes (`level0`-`level4`) and the Quest manifest entries (`com.oculus.supportedDevices`, `android.hardware.vr.headtracking`).
+**APK check:** Android build reported Succeeded (1 error line from the OpenXR Meta Quest validation callback, 354 warnings). The package contains the 5 scenes (`level0`-`level4`) and the Quest manifest entries (`com.oculus.supportedDevices`, `android.hardware.vr.headtracking`).
 
 **Not verified:** the APK has **never been installed or run on a physical headset** (no device, no `adb` here), so comfort, frame rate, controller interaction and panel placement are untested. No human-subject data exists. The one build error is a `NullReferenceException` inside the Unity OpenXR package's Meta Quest validation rules (`MetaQuestFeature.CreateValidationRules`); the build still completes and the cause is unresolved.
 

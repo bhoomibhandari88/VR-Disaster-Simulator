@@ -13,8 +13,8 @@ The repository now contains both the three-stage rescue game and a **START mass-
 | No APK, Library, Temp or Builds in any commit | `git log --all --name-only` finds 0 `.apk`; `.gitignore` covers `Builds/`, `Library/` |
 | EditMode 109/109 pass (57 existing + 52 triage cases); PlayMode 31/31 pass (23 existing + 8 triage) | Unity Test Runner, `Builds/TestSummary.txt` |
 | Triage scene builds from `Rescue Sim > Build > Triage Scene`; editor capture views reviewed; no console errors after compile | `Builds/Shots/TriageSimulation_*.png` (not committed) |
-| Android build Succeeded (22 min), 1 non-blocking OpenXR validation `NullReferenceException`, 354 warnings, 5 scenes | `Builds/android-build-report.txt` |
-| **STALE (built before f054410; rebuild before release)** APK `Builds/Android/DisasterResponseVR.apk`: 242,633,136 bytes (231.4 MiB), SHA-256 `eaa125abb997b220653f94c382ad78136708748555e57c69b1f8c13d94107c8c`, IL2CPP ARM64, Quest manifest entries, `level0`-`level4` | build report, `unzip -l`, manifest strings |
+| Android build Succeeded (1 min incremental, 2026-10-26), 1 non-blocking OpenXR validation `NullReferenceException`, 354 warnings, 5 scenes | `Builds/android-build-report.txt` |
+| APK (rebuilt 2026-10-26 with fix f054410; see BUILD_REPORT.md) `Builds/Android/DisasterResponseVR.apk`: 242,635,956 bytes (231.4 MiB), SHA-256 `a533c6d08427da2d5268c421d9d6cb5ea64f807248abdce518c7476798ecd6f4`, IL2CPP ARM64, Quest manifest entries, `level0`-`level4` | build report, `unzip -l`, manifest strings |
 | C# in `Assets/_Project`: 84 files, 10,012 lines | `find … | wc -l` |
 | Real participant telemetry files: **0** | no `telemetry/` folder |
 | APK **not** installed or run on any device | no headset, no `adb` |

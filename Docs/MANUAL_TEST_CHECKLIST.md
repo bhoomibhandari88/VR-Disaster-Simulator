@@ -17,7 +17,10 @@ Automated tests cover logic and scene wiring (see `TECHNICAL_IMPLEMENTATION_REPO
 - [ ] Console has no red errors during the above.
 
 ## B. Quest headset (PENDING, needs hardware)
+- [ ] Verify the file first: `shasum -a 256 DisasterResponseVR.apk` must equal `a533c6d08427da2d5268c421d9d6cb5ea64f807248abdce518c7476798ecd6f4` (see `BUILD_REPORT.md`; the older `eaa125ab…` APK predates the fix).
 - [ ] `adb install -r DisasterResponseVR.apk`, launch from Unknown Sources.
+- [ ] Selecting a casualty shows no findings until a check button is pressed (the fix in `f054410`).
+- [ ] Start panel shows the protocol line (capillary refill > 2 s).
 - [ ] Menu buttons and casualties can be selected with the controller ray; panels are readable and well placed at standing and seated height.
 - [ ] Teleport and snap turn work; no nausea or discomfort reported after 10 minutes.
 - [ ] Frame rate acceptable (no visible stutter with smoke and fire lights).
